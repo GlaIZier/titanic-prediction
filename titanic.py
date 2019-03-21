@@ -25,7 +25,7 @@ test = pd.read_csv("data/test.csv")
 
 # PassengerId: and id given to each traveler on the boat
 # Pclass: the passenger class. It has three possible values: 1,2,3 (first, second and third class)
-# The Name of the passeger
+# The Name of the passenger
 # The Sex
 # The Age
 # SibSp: number of siblings and spouses traveling with the passenger
@@ -139,6 +139,7 @@ def add_titles(comb):
     status('Title')
     return comb
 
+
 combined = add_titles(get_combined_data())
 
 
@@ -162,6 +163,7 @@ def fill_empty_ages(comb):
     status('age')
     return comb
 
+
 combined = fill_empty_ages(combined)
 
 
@@ -179,6 +181,7 @@ def refine_names(comb):
     status('names')
     return comb
 
+
 combined = refine_names(combined)
 
 
@@ -188,6 +191,7 @@ def fill_empty_fares(comb):
     comb.Fare.fillna(comb.iloc[:891].Fare.mean(), inplace=True)
     status('fare')
     return comb
+
 
 combined = fill_empty_fares(combined)
 
@@ -203,6 +207,7 @@ def fill_empty_embarked(comb):
     comb.drop('Embarked', axis=1, inplace=True)
     status('embarked')
     return comb
+
 
 combined = fill_empty_embarked(combined)
 
@@ -223,6 +228,7 @@ def encode_cabins(comb):
     status('cabin')
     return comb
 
+
 combined = encode_cabins(combined)
 
 
@@ -231,6 +237,7 @@ def encode_sex(comb):
     comb['Sex'] = comb['Sex'].map({'male': 1, 'female': 0})
     status('Sex')
     return comb
+
 
 combined = encode_sex(combined)
 
@@ -247,6 +254,7 @@ def encode_pclasses(comb):
 
     status('Pclass')
     return comb
+
 
 combined = encode_pclasses(combined)
 
@@ -274,6 +282,7 @@ def encode_tickets(comb):
     status('Ticket')
     return comb
 
+
 combined = encode_tickets(combined)
 
 
@@ -290,6 +299,7 @@ def add_family_size(comb):
 
     status('family')
     return comb
+
 
 combined = add_family_size(combined)
 print(combined.head())
