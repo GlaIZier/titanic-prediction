@@ -2,9 +2,7 @@ import numpy as np
 import pandas as pd
 pd.options.display.max_columns = 100
 
-import matplotlib
 from matplotlib import pyplot as plt
-
 import seaborn as sns
 
 import pylab as plot
@@ -16,6 +14,8 @@ params = {
     'figure.figsize': [25, 7]
 }
 plot.rcParams.update(params)
+
+from keras.models import Sequential
 
 train = pd.read_csv("data/train.csv")
 test = pd.read_csv("data/test.csv")
@@ -83,9 +83,9 @@ def analyze_training_data():
     plt.show()
 
 
-# show_data(train, 'train set:')
-# show_data(test, 'test set: ')
-# analyze_training_data()
+show_data(train, 'train set:')
+show_data(test, 'test set: ')
+analyze_training_data()
 
 
 # 2. Feature engineering
