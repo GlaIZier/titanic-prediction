@@ -15,11 +15,6 @@ params = {
 }
 plot.rcParams.update(params)
 
-from keras.models import Sequential
-
-train = pd.read_csv("data/train.csv")
-test = pd.read_csv("data/test.csv")
-
 # 1. Data analysis
 
 
@@ -35,20 +30,25 @@ test = pd.read_csv("data/test.csv")
 # The cabin number
 # The embarkation. This describe three possible areas of the Titanic from which the people embark.
 # Three possible values S,C,Q
+
+raw_train = pd.read_csv("data/train.csv")
+raw_test = pd.read_csv("data/test.csv")
+
+
 def show_data(data, label):
     print(label)
     print(data.head().to_string())
     print(data.describe().to_string())
 
 
-def analyze_training_data():
+def analyze_training_data(train):
     train['Died'] = 1 - train['Survived']
     train.groupby('Sex').agg('sum')[['Survived', 'Died']].plot(kind='bar', figsize=(25, 7),
-                                                               stacked=True, color=['g', 'r'])
+                                                                   stacked=True, color=['g', 'r'])
     plt.show()
 
     train.groupby('Sex').agg('mean')[['Survived', 'Died']].plot(kind='bar', figsize=(25, 7),
-                                                                stacked=True, color=['g', 'r'])
+                                                                    stacked=True, color=['g', 'r'])
     plt.show()
 
     sns.violinplot(x='Sex', y='Age',
@@ -83,9 +83,9 @@ def analyze_training_data():
     plt.show()
 
 
-show_data(train, 'train set:')
-show_data(test, 'test set: ')
-analyze_training_data()
+show_data(raw_train, 'raw train set:')
+show_data(raw_test, 'raw test set: ')
+analyze_training_data(raw_train)
 
 
 # 2. Feature engineering
@@ -93,18 +93,20 @@ def status(feature):
     print('Processing', feature, ': ok')
 
 
-# todo do we need a combined dataset?
+# todo remove it after tests
 def get_combined_data():
     # extracting and then removing the targets from the training data
-    train.drop(['Survived'], 1, inplace=True)
+    raw_train.drop(['Survived'], 1, inplace=True)
 
     # merging train data and test data for future feature engineering
-    comb = train.append(test)
+    comb = raw_train.append(raw_test)
     comb.reset_index(inplace=True)
     comb.drop(['index', 'PassengerId'], inplace=True, axis=1)
 
     return comb
 
+def combine_data(train, test):
+    comb = train.append(test)
 
 def add_titles(comb):
     title_dictionary = {
@@ -140,7 +142,8 @@ def add_titles(comb):
     return comb
 
 
-combined = add_titles(get_combined_data())
+combined = get_combined_data()
+combined = add_titles(combined)
 
 
 # To avoid data leakage from the test set, we fill in missing ages in the train using the train set and we fill in ages
@@ -303,4 +306,7 @@ def add_family_size(comb):
 
 combined = add_family_size(combined)
 print(combined.head())
+print(combined.shape)
+print(raw_train.shape)
+print(raw_test.shape)
 
