@@ -35,7 +35,7 @@ raw_train = pd.read_csv("data/train.csv")
 raw_test = pd.read_csv("data/test.csv")
 
 
-def show_data(data, label):
+def show_data(data, label=''):
     print(label)
     print(data.head().to_string())
     print(data.describe().to_string())
@@ -83,9 +83,9 @@ def analyze_training_data(train):
     plt.show()
 
 
-show_data(raw_train, 'raw train set:')
-show_data(raw_test, 'raw test set: ')
-analyze_training_data(raw_train)
+# show_data(raw_train, 'raw train set:')
+# show_data(raw_test, 'raw test set: ')
+# analyze_training_data(raw_train)
 
 
 # 2. Feature engineering
@@ -105,8 +105,18 @@ def get_combined_data():
 
     return comb
 
+
 def combine_data(train, test):
     comb = train.append(test)
+    comb['is_test'] = 1
+    comb.iloc[:891, comb.columns.get_loc('is_test')] = 0
+    status('Combined')
+    return comb
+
+
+combined = combine_data(raw_train, raw_test)
+show_data(combined, 'combined')
+
 
 def add_titles(comb):
     title_dictionary = {
@@ -142,7 +152,6 @@ def add_titles(comb):
     return comb
 
 
-combined = get_combined_data()
 combined = add_titles(combined)
 
 
@@ -305,8 +314,30 @@ def add_family_size(comb):
 
 
 combined = add_family_size(combined)
-print(combined.head())
-print(combined.shape)
-print(raw_train.shape)
-print(raw_test.shape)
 
+
+def split_combined_data(comb):
+    pr_train = comb[comb['is_test'] == 0]
+    pr_test = comb[comb['is_test'] == 1]
+    return pr_train, pr_test
+
+
+proc_train, proc_test = split_combined_data(combined)
+
+
+def remove_unnecessary_params(data):
+    data.drop(['Survived'], 1, inplace=True)
+    data.drop(['PassengerId'], 1, inplace=True)
+    data.drop(['is_test'], 1, inplace=True)
+    return data
+
+
+proc_train = remove_unnecessary_params(proc_train)
+proc_test = remove_unnecessary_params(proc_test)
+
+print(proc_train.head())
+print(proc_train.shape)
+print(proc_test.head())
+print(proc_test.shape)
+
+exit(0)
