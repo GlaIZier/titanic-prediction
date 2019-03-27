@@ -39,6 +39,7 @@ def show_data(data, label=''):
     print(label)
     print(data.head().to_string())
     print(data.describe().to_string())
+    print(data.shape)
 
 
 def analyze_training_data(train):
@@ -335,9 +336,12 @@ def remove_unnecessary_params(data):
 proc_train = remove_unnecessary_params(proc_train)
 proc_test = remove_unnecessary_params(proc_test)
 
-print(proc_train.head())
-print(proc_train.shape)
-print(proc_test.head())
-print(proc_test.shape)
+show_data(proc_train, 'proc_train')
+show_data(proc_test, 'proc_test')
+
+
+# 3 Model development and prediction
+
+
 
 exit(0)
