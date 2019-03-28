@@ -326,22 +326,26 @@ def split_combined_data(comb):
 proc_train, proc_test = split_combined_data(combined)
 
 
+# 3 Model development and prediction
+def extract_survived(data):
+    return data['Survived']
+
+
 def remove_unnecessary_params(data):
-    data.drop(['Survived'], 1, inplace=True)
-    data.drop(['PassengerId'], 1, inplace=True)
-    data.drop(['is_test'], 1, inplace=True)
-    return data
+    modified = data.drop(['Survived'], 1)
+    modified.drop(['PassengerId'], 1, inplace=True)
+    modified.drop(['is_test'], 1, inplace=True)
+    return modified
 
 
-proc_train = remove_unnecessary_params(proc_train)
-proc_test = remove_unnecessary_params(proc_test)
+y_train = extract_survived(proc_train)
+x_train = remove_unnecessary_params(proc_train)
+x_test = remove_unnecessary_params(proc_test)
 
 show_data(proc_train, 'proc_train')
 show_data(proc_test, 'proc_test')
-
-
-# 3 Model development and prediction
-
-
+show_data(y_train, 'y_train')
+show_data(x_train, 'x_train')
+show_data(x_test, 'x_test')
 
 exit(0)
