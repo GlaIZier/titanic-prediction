@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+from keras.layers import Dense
+
 pd.options.display.max_columns = 100
 
 from matplotlib import pyplot as plt
@@ -342,10 +344,22 @@ y_train = extract_survived(proc_train)
 x_train = remove_unnecessary_params(proc_train)
 x_test = remove_unnecessary_params(proc_test)
 
-show_data(proc_train, 'proc_train')
-show_data(proc_test, 'proc_test')
-show_data(y_train, 'y_train')
-show_data(x_train, 'x_train')
-show_data(x_test, 'x_test')
+# show_data(proc_train, 'proc_train')
+# show_data(proc_test, 'proc_test')
+# show_data(y_train, 'y_train')
+# show_data(x_train, 'x_train')
+# show_data(x_test, 'x_test')
 
+import tensorflow
+from keras import models, metrics
+from keras.legacy import layers
+
+model = models.Sequential()
+model.add(Dense(units=16, activation='relu', input_dim=x_train.shape[1]))
+model.add(Dense(units=16, activation='relu'))
+model.add(Dense(1, activation='sigmoid'))
+
+model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
+
+history = model.fit(x_train, y_train, epochs=200, batch_size=512, verbose=2)
 exit(0)
