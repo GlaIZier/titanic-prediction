@@ -35,6 +35,7 @@ plot.rcParams.update(params)
 
 raw_train = pd.read_csv("data/train.csv")
 raw_test = pd.read_csv("data/test.csv")
+train_border_index = 891
 
 
 def show_data(data, label=''):
@@ -112,13 +113,13 @@ def get_combined_data():
 def combine_data(train, test):
     comb = train.append(test)
     comb['is_test'] = 1
-    comb.iloc[:891, comb.columns.get_loc('is_test')] = 0
+    comb.iloc[:train_border_index, comb.columns.get_loc('is_test')] = 0
     status('Combined')
     return comb
 
 
 combined = combine_data(raw_train, raw_test)
-show_data(combined, 'combined')
+# show_data(combined, 'combined')
 
 
 def add_titles(comb):
@@ -161,9 +162,9 @@ combined = add_titles(combined)
 # To avoid data leakage from the test set, we fill in missing ages in the train using the train set and we fill in ages
 # in the test set using values calculated from the train set as well.
 def fill_empty_ages(comb):
-    # print('The number of empty ages: ', comb.iloc[:891].Age.isnull().sum())
+    # print('The number of empty ages: ', comb.iloc[:train_border_index].Age.isnull().sum())
     # calculate median ages for different categories of passengers
-    grouped_train = comb.iloc[:891].groupby(['Sex', 'Pclass', 'Title'])
+    grouped_train = comb.iloc[:train_border_index].groupby(['Sex', 'Pclass', 'Title'])
     grouped_median_train = grouped_train.median().reset_index()[['Sex', 'Pclass', 'Title', 'Age']]
 
     def fill_age(row):
@@ -201,9 +202,9 @@ combined = refine_names(combined)
 
 
 def fill_empty_fares(comb):
-    # print('The number of empty fares: ', comb.iloc[:891].Fare.isnull().sum())
+    # print('The number of empty fares: ', comb.iloc[:train_border_index].Fare.isnull().sum())
     # there's one missing fare value - replacing it with the mean.
-    comb.Fare.fillna(comb.iloc[:891].Fare.mean(), inplace=True)
+    comb.Fare.fillna(comb.iloc[:train_border_index].Fare.mean(), inplace=True)
     status('fare')
     return comb
 
@@ -212,9 +213,9 @@ combined = fill_empty_fares(combined)
 
 
 def fill_empty_embarked(comb):
-    # print('The number of empty fares: ', comb.iloc[:891].Embarked.isnull().sum())
+    # print('The number of empty fares: ', comb.iloc[:train_border_index].Embarked.isnull().sum())
     # two missing embarked values - filling them with the most frequent one in the train  set(S)
-    frequent_embarked = comb.iloc[:891].Embarked.mode()[0]
+    frequent_embarked = comb.iloc[:train_border_index].Embarked.mode()[0]
     comb.Embarked.fillna(frequent_embarked, inplace=True)
     # dummy encoding
     embarked_dummies = pd.get_dummies(comb['Embarked'], prefix='Embarked')
@@ -329,6 +330,8 @@ proc_train, proc_test = split_combined_data(combined)
 
 
 # 3 Model development and prediction
+validation_border_index = 265
+
 def extract_survived(data):
     return data['Survived']
 
@@ -340,14 +343,18 @@ def remove_unnecessary_params(data):
     return modified
 
 
-y_train = extract_survived(proc_train)
-x_train = remove_unnecessary_params(proc_train)
+x_train = remove_unnecessary_params(proc_train.iloc[validation_border_index:train_border_index])
+y_train = extract_survived(proc_train.iloc[validation_border_index:train_border_index])
+x_val = remove_unnecessary_params(proc_train.iloc[:validation_border_index])
+y_val = extract_survived(proc_train.iloc[:validation_border_index])
 x_test = remove_unnecessary_params(proc_test)
 
 # show_data(proc_train, 'proc_train')
 # show_data(proc_test, 'proc_test')
-# show_data(y_train, 'y_train')
 # show_data(x_train, 'x_train')
+# show_data(y_train, 'y_train')
+# show_data(x_val, 'x_val')
+# show_data(y_val, 'y_val')
 # show_data(x_test, 'x_test')
 
 import tensorflow
@@ -361,5 +368,25 @@ model.add(Dense(1, activation='sigmoid'))
 
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
 
-history = model.fit(x_train, y_train, epochs=200, batch_size=512, verbose=2)
+history = model.fit(x_train, y_train, epochs=500, batch_size=512, verbose=2, validation_data=[x_val, y_val])
+
+# 4. Analyse
+
+
+def plot_train_val_loss(hist, epochs=500):
+    history_dict = hist.history
+    loss_values = history_dict['loss']
+    val_loss_values = history_dict['val_loss']
+    points = range(0, epochs)
+    plt.plot(points, loss_values, 'bo', label='Training loss')
+    plt.plot(points, val_loss_values, 'b', label='Validation loss')
+    plt.title('Training and validation loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    plt.show()
+
+
+plot_train_val_loss(history, 500)
 exit(0)
