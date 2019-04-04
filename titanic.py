@@ -1,13 +1,16 @@
 import numpy as np
 import pandas as pd
-from keras.layers import Dense
-
-pd.options.display.max_columns = 100
 
 from matplotlib import pyplot as plt
 import seaborn as sns
-
 import pylab as plot
+
+import tensorflow
+from keras import models, metrics
+from keras.legacy import layers
+from keras.layers import Dense
+
+pd.options.display.max_columns = 100
 params = {
     'axes.labelsize': "large",
     'xtick.labelsize': 'x-large',
@@ -95,19 +98,6 @@ def analyze_training_data(train):
 # 2. Feature engineering
 def status(feature):
     print('Processing', feature, ': ok')
-
-
-# todo remove it after tests
-def get_combined_data():
-    # extracting and then removing the targets from the training data
-    raw_train.drop(['Survived'], 1, inplace=True)
-
-    # merging train data and test data for future feature engineering
-    comb = raw_train.append(raw_test)
-    comb.reset_index(inplace=True)
-    comb.drop(['index', 'PassengerId'], inplace=True, axis=1)
-
-    return comb
 
 
 def combine_data(train, test):
@@ -332,6 +322,7 @@ proc_train, proc_test = split_combined_data(combined)
 # 3 Model development and prediction
 validation_border_index = 265
 
+
 def extract_survived(data):
     return data['Survived']
 
@@ -357,27 +348,25 @@ x_test = remove_unnecessary_params(proc_test)
 # show_data(y_val, 'y_val')
 # show_data(x_test, 'x_test')
 
-import tensorflow
-from keras import models, metrics
-from keras.legacy import layers
-
 model = models.Sequential()
-model.add(Dense(units=16, activation='relu', input_dim=x_train.shape[1]))
+model.add(Dense(units=256, activation='relu', input_dim=x_train.shape[1]))
+model.add(Dense(units=64, activation='relu'))
 model.add(Dense(units=16, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
 
-history = model.fit(x_train, y_train, epochs=500, batch_size=512, verbose=2, validation_data=[x_val, y_val])
+epochs = 300
+history = model.fit(x_train, y_train, epochs=epochs, batch_size=512, verbose=2, validation_data=[x_val, y_val])
 
-# 4. Analyse
+# 4. Model analysis
 
 
-def plot_train_val_loss(hist, epochs=500):
+def plot_train_val_loss(hist, points=epochs):
     history_dict = hist.history
     loss_values = history_dict['loss']
     val_loss_values = history_dict['val_loss']
-    points = range(0, epochs)
+    points = range(0, points)
     plt.plot(points, loss_values, 'bo', label='Training loss')
     plt.plot(points, val_loss_values, 'b', label='Validation loss')
     plt.title('Training and validation loss')
@@ -388,5 +377,21 @@ def plot_train_val_loss(hist, epochs=500):
     plt.show()
 
 
-plot_train_val_loss(history, 500)
+def plot_train_val_acc(hist, points=epochs):
+    history_dict = hist.history
+    loss_values = history_dict['acc']
+    val_loss_values = history_dict['val_acc']
+    points = range(0, points)
+    plt.plot(points, loss_values, 'bo', label='Training acc')
+    plt.plot(points, val_loss_values, 'b', label='Validation acc')
+    plt.title('Training and validation acc')
+    plt.xlabel('Epochs')
+    plt.ylabel('Loss')
+    plt.legend()
+
+    plt.show()
+
+
+plot_train_val_loss(history)
+plot_train_val_acc(history)
 exit(0)
