@@ -149,6 +149,7 @@ def add_titles(comb):
 combined = add_titles(combined)
 
 
+# If age is missing, replace it with a mean value
 # To avoid data leakage from the test set, we fill in missing ages in the train using the train set and we fill in ages
 # in the test set using values calculated from the train set as well.
 def fill_empty_ages(comb):

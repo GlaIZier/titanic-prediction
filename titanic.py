@@ -149,30 +149,6 @@ def add_titles(comb):
 combined = add_titles(combined)
 
 
-# To avoid data leakage from the test set, we fill in missing ages in the train using the train set and we fill in ages
-# in the test set using values calculated from the train set as well.
-def fill_empty_ages(comb):
-    # print('The number of empty ages: ', comb.iloc[:train_border_index].Age.isnull().sum())
-    # calculate median ages for different categories of passengers
-    grouped_train = comb.iloc[:train_border_index].groupby(['Sex', 'Pclass', 'Title'])
-    grouped_median_train = grouped_train.median().reset_index()[['Sex', 'Pclass', 'Title', 'Age']]
-
-    def fill_age(row):
-        condition = (
-            (grouped_median_train['Sex'] == row['Sex']) &
-            (grouped_median_train['Title'] == row['Title']) &
-            (grouped_median_train['Pclass'] == row['Pclass'])
-        )
-        return grouped_median_train[condition]['Age'].values[0]
-    # replace age with a median one if it's nan
-    comb['Age'] = comb.apply(lambda row: fill_age(row) if np.isnan(row['Age']) else row['Age'], axis=1)
-    status('age')
-    return comb
-
-
-combined = fill_empty_ages(combined)
-
-
 def refine_names(comb):
     # we clean the Name variable
     comb.drop('Name', axis=1, inplace=True)
@@ -191,31 +167,14 @@ def refine_names(comb):
 combined = refine_names(combined)
 
 
-def fill_empty_fares(comb):
-    # print('The number of empty fares: ', comb.iloc[:train_border_index].Fare.isnull().sum())
-    # there's one missing fare value - replacing it with the mean.
-    comb.Fare.fillna(comb.iloc[:train_border_index].Fare.mean(), inplace=True)
-    status('fare')
+def encode_sex(comb):
+    # mapping string values to numerical one
+    comb['Sex'] = comb['Sex'].map({'male': 1, 'female': 0})
+    status('Sex')
     return comb
 
 
-combined = fill_empty_fares(combined)
-
-
-def fill_empty_embarked(comb):
-    # print('The number of empty fares: ', comb.iloc[:train_border_index].Embarked.isnull().sum())
-    # two missing embarked values - filling them with the most frequent one in the train  set(S)
-    frequent_embarked = comb.iloc[:train_border_index].Embarked.mode()[0]
-    comb.Embarked.fillna(frequent_embarked, inplace=True)
-    # dummy encoding
-    embarked_dummies = pd.get_dummies(comb['Embarked'], prefix='Embarked')
-    comb = pd.concat([comb, embarked_dummies], axis=1)
-    comb.drop('Embarked', axis=1, inplace=True)
-    status('embarked')
-    return comb
-
-
-combined = fill_empty_embarked(combined)
+combined = encode_sex(combined)
 
 
 # As we don't have any cabin letter in the test set that is not present in the train set, we can replace the whole set
@@ -236,16 +195,6 @@ def encode_cabins(comb):
 
 
 combined = encode_cabins(combined)
-
-
-def encode_sex(comb):
-    # mapping string values to numerical one
-    comb['Sex'] = comb['Sex'].map({'male': 1, 'female': 0})
-    status('Sex')
-    return comb
-
-
-combined = encode_sex(combined)
 
 
 def encode_pclasses(comb):
@@ -292,6 +241,33 @@ def encode_tickets(comb):
 combined = encode_tickets(combined)
 
 
+def fill_empty_fares(comb):
+    # print('The number of empty fares: ', comb.iloc[:train_border_index].Fare.isnull().sum())
+    # there's one missing fare value - replacing it with the mean.
+    comb.Fare.fillna(comb.iloc[:train_border_index].Fare.mean(), inplace=True)
+    status('fare')
+    return comb
+
+
+combined = fill_empty_fares(combined)
+
+
+def fill_empty_embarked(comb):
+    # print('The number of empty fares: ', comb.iloc[:train_border_index].Embarked.isnull().sum())
+    # two missing embarked values - filling them with the most frequent one in the train  set(S)
+    frequent_embarked = comb.iloc[:train_border_index].Embarked.mode()[0]
+    comb.Embarked.fillna(frequent_embarked, inplace=True)
+    # dummy encoding
+    embarked_dummies = pd.get_dummies(comb['Embarked'], prefix='Embarked')
+    comb = pd.concat([comb, embarked_dummies], axis=1)
+    comb.drop('Embarked', axis=1, inplace=True)
+    status('embarked')
+    return comb
+
+
+combined = fill_empty_embarked(combined)
+
+
 # addition of a new feature: Large families are grouped together;
 # hence, they are more likely to get rescued than people traveling alone.
 def add_family_size(comb):
@@ -308,6 +284,31 @@ def add_family_size(comb):
 
 
 combined = add_family_size(combined)
+show_data(combined, 'com')
+
+
+# To avoid data leakage from the test set, we fill in missing ages in the train using the train set and we fill in ages
+# in the test set using values calculated from the train set as well.
+def fill_empty_ages(comb):
+    # print('The number of empty ages: ', comb.iloc[:train_border_index].Age.isnull().sum())
+    # calculate median ages for different categories of passengers
+    grouped_train = comb.iloc[:train_border_index].groupby(['Sex', 'Pclass', 'Title'])
+    grouped_median_train = grouped_train.median().reset_index()[['Sex', 'Pclass', 'Title', 'Age']]
+
+    def fill_age(row):
+        condition = (
+            (grouped_median_train['Sex'] == row['Sex']) &
+            (grouped_median_train['Title'] == row['Title']) &
+            (grouped_median_train['Pclass'] == row['Pclass'])
+        )
+        return grouped_median_train[condition]['Age'].values[0]
+    # replace age with a median one if it's nan
+    comb['Age'] = comb.apply(lambda row: fill_age(row) if np.isnan(row['Age']) else row['Age'], axis=1)
+    status('age')
+    return comb
+
+
+combined = fill_empty_ages(combined)
 
 
 def split_combined_data(comb):
