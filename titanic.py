@@ -108,10 +108,6 @@ def combine_data(train, test):
     return comb
 
 
-combined = combine_data(raw_train, raw_test)
-# show_data(combined, 'combined')
-
-
 def add_titles(comb):
     title_dictionary = {
         "Capt": "Officer",
@@ -146,9 +142,6 @@ def add_titles(comb):
     return comb
 
 
-combined = add_titles(combined)
-
-
 def refine_names(comb):
     # we clean the Name variable
     comb.drop('Name', axis=1, inplace=True)
@@ -164,17 +157,11 @@ def refine_names(comb):
     return comb
 
 
-combined = refine_names(combined)
-
-
 def encode_sex(comb):
     # mapping string values to numerical one
     comb['Sex'] = comb['Sex'].map({'male': 1, 'female': 0})
     status('Sex')
     return comb
-
-
-combined = encode_sex(combined)
 
 
 # As we don't have any cabin letter in the test set that is not present in the train set, we can replace the whole set
@@ -194,9 +181,6 @@ def encode_cabins(comb):
     return comb
 
 
-combined = encode_cabins(combined)
-
-
 def encode_pclasses(comb):
     # encoding into 3 categories:
     pclass_dummies = pd.get_dummies(comb['Pclass'], prefix="Pclass")
@@ -209,9 +193,6 @@ def encode_pclasses(comb):
 
     status('Pclass')
     return comb
-
-
-combined = encode_pclasses(combined)
 
 
 def encode_tickets(comb):
@@ -238,18 +219,12 @@ def encode_tickets(comb):
     return comb
 
 
-combined = encode_tickets(combined)
-
-
 def fill_empty_fares(comb):
     # print('The number of empty fares: ', comb.iloc[:train_border_index].Fare.isnull().sum())
     # there's one missing fare value - replacing it with the mean.
     comb.Fare.fillna(comb.iloc[:train_border_index].Fare.mean(), inplace=True)
     status('fare')
     return comb
-
-
-combined = fill_empty_fares(combined)
 
 
 def fill_empty_embarked(comb):
@@ -263,9 +238,6 @@ def fill_empty_embarked(comb):
     comb.drop('Embarked', axis=1, inplace=True)
     status('embarked')
     return comb
-
-
-combined = fill_empty_embarked(combined)
 
 
 # addition of a new feature: Large families are grouped together;
@@ -283,13 +255,30 @@ def add_family_size(comb):
     return comb
 
 
-combined = add_family_size(combined)
-show_data(combined, 'com')
+def remove_passenger_id(data):
+    return data.drop(['PassengerId'], 1)
+
+
+def remove_is_test(data):
+    return data.drop(['is_test'], 1)
+
+
+def remove_age(data):
+    return data.drop(['Age'], 1)
 
 
 # To avoid data leakage from the test set, we fill in missing ages in the train using the train set and we fill in ages
 # in the test set using values calculated from the train set as well.
-def fill_empty_ages(comb):
+def predict_empty_ages(comb):
+    train_age = comb[comb['is_test'] == 0]
+    train_age = remove_is_test(train_age)
+    train_age = train_age[train_age['Age'].notnull()]
+    show_data(train_age, 'train_age')
+    x_train_age = remove_age(train_age)
+    show_data(x_train_age, 'x_train_age')
+    y_train_age = train_age['Age']
+    show_data(y_train_age, 'y_train_age')
+
     # print('The number of empty ages: ', comb.iloc[:train_border_index].Age.isnull().sum())
     # calculate median ages for different categories of passengers
     grouped_train = comb.iloc[:train_border_index].groupby(['Sex', 'Pclass', 'Title'])
@@ -308,7 +297,19 @@ def fill_empty_ages(comb):
     return comb
 
 
-combined = fill_empty_ages(combined)
+combined = combine_data(raw_train, raw_test)
+# show_data(combined, 'combined')
+combined = add_titles(combined)
+combined = refine_names(combined)
+combined = encode_sex(combined)
+combined = encode_cabins(combined)
+combined = encode_pclasses(combined)
+combined = encode_tickets(combined)
+combined = fill_empty_fares(combined)
+combined = fill_empty_embarked(combined)
+combined = add_family_size(combined)
+combined = remove_passenger_id(combined)
+combined = predict_empty_ages(combined)
 
 
 def split_combined_data(comb):
@@ -328,18 +329,20 @@ def extract_survived(data):
     return data['Survived']
 
 
-def remove_unnecessary_params(data):
-    modified = data.drop(['Survived'], 1)
-    modified.drop(['PassengerId'], 1, inplace=True)
-    modified.drop(['is_test'], 1, inplace=True)
-    return modified
+def remove_survived(data):
+    return data.drop(['Survived'], 1)
 
 
-x_train = remove_unnecessary_params(proc_train.iloc[validation_border_index:train_border_index])
+x_train = remove_survived(proc_train.iloc[validation_border_index:train_border_index])
+x_train = remove_is_test(x_train)
 y_train = extract_survived(proc_train.iloc[validation_border_index:train_border_index])
-x_val = remove_unnecessary_params(proc_train.iloc[:validation_border_index])
+
+x_val = remove_survived(proc_train.iloc[:validation_border_index])
+x_val = remove_is_test(x_val)
 y_val = extract_survived(proc_train.iloc[:validation_border_index])
-x_test = remove_unnecessary_params(proc_test)
+
+x_test = remove_survived(proc_test)
+x_test = remove_is_test(x_test)
 
 # show_data(proc_train, 'proc_train')
 # show_data(proc_test, 'proc_test')
