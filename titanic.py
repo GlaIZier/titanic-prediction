@@ -267,33 +267,50 @@ def remove_age(data):
     return data.drop(['Age'], 1)
 
 
+def remove_survived(data):
+    return data.drop(['Survived'], 1)
+
+
 # To avoid data leakage from the test set, we fill in missing ages in the train using the train set and we fill in ages
 # in the test set using values calculated from the train set as well.
 def predict_empty_ages(comb):
-    train_age = comb[comb['is_test'] == 0]
-    train_age = remove_is_test(train_age)
-    train_age = train_age[train_age['Age'].notnull()]
-    show_data(train_age, 'train_age')
-    x_train_age = remove_age(train_age)
-    show_data(x_train_age, 'x_train_age')
-    y_train_age = train_age['Age']
-    show_data(y_train_age, 'y_train_age')
+    data = comb[comb['is_test'] == 0]
+    data = remove_is_test(data)
+    x_train_age = data[data['Age'].notnull()]
+    x_train_age = remove_age(x_train_age)
+    x_train_age = remove_survived(x_train_age)
+    y_train_age = data['Age']
+    y_train_age = y_train_age[y_train_age.notnull()]
 
-    # print('The number of empty ages: ', comb.iloc[:train_border_index].Age.isnull().sum())
-    # calculate median ages for different categories of passengers
-    grouped_train = comb.iloc[:train_border_index].groupby(['Sex', 'Pclass', 'Title'])
-    grouped_median_train = grouped_train.median().reset_index()[['Sex', 'Pclass', 'Title', 'Age']]
+    mod = models.Sequential()
+    mod.add(Dense(units=64, activation='relu', input_dim=x_train_age.shape[1]))
+    mod.add(Dense(units=16, activation='relu'))
+    mod.add(Dense(1, activation='linear'))
 
-    def fill_age(row):
-        condition = (
-            (grouped_median_train['Sex'] == row['Sex']) &
-            (grouped_median_train['Title'] == row['Title']) &
-            (grouped_median_train['Pclass'] == row['Pclass'])
-        )
-        return grouped_median_train[condition]['Age'].values[0]
-    # replace age with a median one if it's nan
-    comb['Age'] = comb.apply(lambda row: fill_age(row) if np.isnan(row['Age']) else row['Age'], axis=1)
-    status('age')
+    mod.compile(optimizer='rmsprop', loss='mse', metrics=['mae'])
+    epo = 200
+    mod.fit(x_train_age, y_train_age, epochs=epo, batch_size=512, verbose=2)
+
+    train_predict_age = data[data['Age'].isnull()]
+    train_predict_age = remove_age(train_predict_age)
+    train_predict_age = remove_survived(train_predict_age)
+    p_train = mod.predict(train_predict_age.values)
+    # print(p_train)
+
+    test_predict_age = comb[comb['is_test'] == 1]
+    test_predict_age = remove_is_test(test_predict_age)
+    test_predict_age = test_predict_age[test_predict_age['Age'].isnull()]
+    test_predict_age = remove_age(test_predict_age)
+    test_predict_age = remove_survived(test_predict_age)
+    p_test = mod.predict(test_predict_age.values)
+
+    p = np.rint(np.concatenate((p_train, p_test)))
+    p = p.astype(int)
+    p = p.flatten()
+    # print(p)
+
+    comb['Age'].loc[comb['Age'].isnull()] = p
+    show_data(comb, 'comb')
     return comb
 
 
@@ -327,10 +344,6 @@ validation_border_index = 265
 
 def extract_survived(data):
     return data['Survived']
-
-
-def remove_survived(data):
-    return data.drop(['Survived'], 1)
 
 
 x_train = remove_survived(proc_train.iloc[validation_border_index:train_border_index])
