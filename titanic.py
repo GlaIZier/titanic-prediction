@@ -310,7 +310,7 @@ def predict_empty_ages(comb):
     # print(p)
 
     comb['Age'].loc[comb['Age'].isnull()] = p
-    show_data(comb, 'comb')
+    # show_data(comb, 'comb')
     return comb
 
 
@@ -366,14 +366,13 @@ x_test = remove_is_test(x_test)
 # show_data(x_test, 'x_test')
 
 model = models.Sequential()
-model.add(Dense(units=256, activation='relu', input_dim=x_train.shape[1]))
-model.add(Dense(units=64, activation='relu'))
-model.add(Dense(units=16, activation='relu'))
+model.add(Dense(units=4, activation='relu', input_dim=x_train.shape[1]))
+model.add(Dense(units=2, activation='relu'))
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
 
-epochs = 300
+epochs = 700
 history = model.fit(x_train, y_train, epochs=epochs, batch_size=512, verbose=2, validation_data=[x_val, y_val])
 
 # 4. Model analysis
