@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from keras.wrappers.scikit_learn import KerasClassifier
 
 from matplotlib import pyplot as plt
 import seaborn as sns
@@ -8,7 +9,9 @@ import pylab as plot
 import tensorflow
 from keras import models, metrics
 from keras.legacy import layers
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
+
+from sklearn.model_selection import cross_val_score, StratifiedKFold
 
 pd.options.display.max_columns = 100
 params = {
@@ -108,6 +111,10 @@ def combine_data(train, test):
     return comb
 
 
+combined = combine_data(raw_train, raw_test)
+# show_data(combined, 'combined')
+
+
 def add_titles(comb):
     title_dictionary = {
         "Capt": "Officer",
@@ -142,6 +149,34 @@ def add_titles(comb):
     return comb
 
 
+combined = add_titles(combined)
+
+
+# If age is missing, replace it with a mean value
+# To avoid data leakage from the test set, we fill in missing ages in the train using the train set and we fill in ages
+# in the test set using values calculated from the train set as well.
+def fill_empty_ages(comb):
+    # print('The number of empty ages: ', comb.iloc[:train_border_index].Age.isnull().sum())
+    # calculate median ages for different categories of passengers
+    grouped_train = comb.iloc[:train_border_index].groupby(['Sex', 'Pclass', 'Title'])
+    grouped_median_train = grouped_train.median().reset_index()[['Sex', 'Pclass', 'Title', 'Age']]
+
+    def fill_age(row):
+        condition = (
+            (grouped_median_train['Sex'] == row['Sex']) &
+            (grouped_median_train['Title'] == row['Title']) &
+            (grouped_median_train['Pclass'] == row['Pclass'])
+        )
+        return grouped_median_train[condition]['Age'].values[0]
+    # replace age with a median one if it's nan
+    comb['Age'] = comb.apply(lambda row: fill_age(row) if np.isnan(row['Age']) else row['Age'], axis=1)
+    status('age')
+    return comb
+
+
+combined = fill_empty_ages(combined)
+
+
 def refine_names(comb):
     # we clean the Name variable
     comb.drop('Name', axis=1, inplace=True)
@@ -157,11 +192,34 @@ def refine_names(comb):
     return comb
 
 
-def encode_sex(comb):
-    # mapping string values to numerical one
-    comb['Sex'] = comb['Sex'].map({'male': 1, 'female': 0})
-    status('Sex')
+combined = refine_names(combined)
+
+
+def fill_empty_fares(comb):
+    # print('The number of empty fares: ', comb.iloc[:train_border_index].Fare.isnull().sum())
+    # there's one missing fare value - replacing it with the mean.
+    comb.Fare.fillna(comb.iloc[:train_border_index].Fare.mean(), inplace=True)
+    status('fare')
     return comb
+
+
+combined = fill_empty_fares(combined)
+
+
+def fill_empty_embarked(comb):
+    # print('The number of empty fares: ', comb.iloc[:train_border_index].Embarked.isnull().sum())
+    # two missing embarked values - filling them with the most frequent one in the train  set(S)
+    frequent_embarked = comb.iloc[:train_border_index].Embarked.mode()[0]
+    comb.Embarked.fillna(frequent_embarked, inplace=True)
+    # dummy encoding
+    embarked_dummies = pd.get_dummies(comb['Embarked'], prefix='Embarked')
+    comb = pd.concat([comb, embarked_dummies], axis=1)
+    comb.drop('Embarked', axis=1, inplace=True)
+    status('embarked')
+    return comb
+
+
+combined = fill_empty_embarked(combined)
 
 
 # As we don't have any cabin letter in the test set that is not present in the train set, we can replace the whole set
@@ -181,6 +239,19 @@ def encode_cabins(comb):
     return comb
 
 
+combined = encode_cabins(combined)
+
+
+def encode_sex(comb):
+    # mapping string values to numerical one
+    comb['Sex'] = comb['Sex'].map({'male': 1, 'female': 0})
+    status('Sex')
+    return comb
+
+
+combined = encode_sex(combined)
+
+
 def encode_pclasses(comb):
     # encoding into 3 categories:
     pclass_dummies = pd.get_dummies(comb['Pclass'], prefix="Pclass")
@@ -193,6 +264,9 @@ def encode_pclasses(comb):
 
     status('Pclass')
     return comb
+
+
+combined = encode_pclasses(combined)
 
 
 def encode_tickets(comb):
@@ -219,25 +293,7 @@ def encode_tickets(comb):
     return comb
 
 
-def fill_empty_fares(comb):
-    # print('The number of empty fares: ', comb.iloc[:train_border_index].Fare.isnull().sum())
-    # there's one missing fare value - replacing it with the mean.
-    comb.Fare.fillna(comb.iloc[:train_border_index].Fare.mean(), inplace=True)
-    status('fare')
-    return comb
-
-
-def fill_empty_embarked(comb):
-    # print('The number of empty fares: ', comb.iloc[:train_border_index].Embarked.isnull().sum())
-    # two missing embarked values - filling them with the most frequent one in the train  set(S)
-    frequent_embarked = comb.iloc[:train_border_index].Embarked.mode()[0]
-    comb.Embarked.fillna(frequent_embarked, inplace=True)
-    # dummy encoding
-    embarked_dummies = pd.get_dummies(comb['Embarked'], prefix='Embarked')
-    comb = pd.concat([comb, embarked_dummies], axis=1)
-    comb.drop('Embarked', axis=1, inplace=True)
-    status('embarked')
-    return comb
+combined = encode_tickets(combined)
 
 
 # addition of a new feature: Large families are grouped together;
@@ -255,78 +311,7 @@ def add_family_size(comb):
     return comb
 
 
-def remove_passenger_id(data):
-    return data.drop(['PassengerId'], 1)
-
-
-def remove_is_test(data):
-    return data.drop(['is_test'], 1)
-
-
-def remove_age(data):
-    return data.drop(['Age'], 1)
-
-
-def remove_survived(data):
-    return data.drop(['Survived'], 1)
-
-
-# To avoid data leakage from the test set, we fill in missing ages in the train using the train set and we fill in ages
-# in the test set using values calculated from the train set as well.
-def predict_empty_ages(comb):
-    data = comb[comb['is_test'] == 0]
-    data = remove_is_test(data)
-    x_train_age = data[data['Age'].notnull()]
-    x_train_age = remove_age(x_train_age)
-    x_train_age = remove_survived(x_train_age)
-    y_train_age = data['Age']
-    y_train_age = y_train_age[y_train_age.notnull()]
-
-    mod = models.Sequential()
-    mod.add(Dense(units=64, activation='relu', input_dim=x_train_age.shape[1]))
-    mod.add(Dense(units=16, activation='relu'))
-    mod.add(Dense(1, activation='linear'))
-
-    mod.compile(optimizer='rmsprop', loss='mse', metrics=['mae'])
-    epo = 200
-    mod.fit(x_train_age, y_train_age, epochs=epo, batch_size=512, verbose=2)
-
-    train_predict_age = data[data['Age'].isnull()]
-    train_predict_age = remove_age(train_predict_age)
-    train_predict_age = remove_survived(train_predict_age)
-    p_train = mod.predict(train_predict_age.values)
-    # print(p_train)
-
-    test_predict_age = comb[comb['is_test'] == 1]
-    test_predict_age = remove_is_test(test_predict_age)
-    test_predict_age = test_predict_age[test_predict_age['Age'].isnull()]
-    test_predict_age = remove_age(test_predict_age)
-    test_predict_age = remove_survived(test_predict_age)
-    p_test = mod.predict(test_predict_age.values)
-
-    p = np.rint(np.concatenate((p_train, p_test)))
-    p = p.astype(int)
-    p = p.flatten()
-    # print(p)
-
-    comb['Age'].loc[comb['Age'].isnull()] = p
-    # show_data(comb, 'comb')
-    return comb
-
-
-combined = combine_data(raw_train, raw_test)
-# show_data(combined, 'combined')
-combined = add_titles(combined)
-combined = refine_names(combined)
-combined = encode_sex(combined)
-combined = encode_cabins(combined)
-combined = encode_pclasses(combined)
-combined = encode_tickets(combined)
-combined = fill_empty_fares(combined)
-combined = fill_empty_embarked(combined)
 combined = add_family_size(combined)
-combined = remove_passenger_id(combined)
-combined = predict_empty_ages(combined)
 
 
 def split_combined_data(comb):
@@ -339,23 +324,20 @@ proc_train, proc_test = split_combined_data(combined)
 
 
 # 3 Model development and prediction
-validation_border_index = 265
-
-
 def extract_survived(data):
     return data['Survived']
 
 
-x_train = remove_survived(proc_train.iloc[validation_border_index:train_border_index])
-x_train = remove_is_test(x_train)
-y_train = extract_survived(proc_train.iloc[validation_border_index:train_border_index])
+def remove_unnecessary_params(data):
+    modified = data.drop(['Survived'], 1)
+    modified.drop(['PassengerId'], 1, inplace=True)
+    modified.drop(['is_test'], 1, inplace=True)
+    return modified
 
-x_val = remove_survived(proc_train.iloc[:validation_border_index])
-x_val = remove_is_test(x_val)
-y_val = extract_survived(proc_train.iloc[:validation_border_index])
 
-x_test = remove_survived(proc_test)
-x_test = remove_is_test(x_test)
+x_train = remove_unnecessary_params(proc_train.iloc[0:train_border_index])
+y_train = extract_survived(proc_train.iloc[0:train_border_index])
+x_test = remove_unnecessary_params(proc_test)
 
 # show_data(proc_train, 'proc_train')
 # show_data(proc_test, 'proc_test')
@@ -365,49 +347,21 @@ x_test = remove_is_test(x_test)
 # show_data(y_val, 'y_val')
 # show_data(x_test, 'x_test')
 
-model = models.Sequential()
-model.add(Dense(units=4, activation='relu', input_dim=x_train.shape[1]))
-model.add(Dense(units=2, activation='relu'))
-model.add(Dense(1, activation='sigmoid'))
 
-model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
-
-epochs = 700
-history = model.fit(x_train, y_train, epochs=epochs, batch_size=512, verbose=2, validation_data=[x_val, y_val])
-
-# 4. Model analysis
-
-
-def plot_train_val_loss(hist, points=epochs):
-    history_dict = hist.history
-    loss_values = history_dict['loss']
-    val_loss_values = history_dict['val_loss']
-    points = range(0, points)
-    plt.plot(points, loss_values, 'bo', label='Training loss')
-    plt.plot(points, val_loss_values, 'b', label='Validation loss')
-    plt.title('Training and validation loss')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
-
-    plt.show()
+def create_baseline():
+    model = models.Sequential()
+    model.add(Dense(1024, input_dim=x_train.shape[1], activation='relu'))
+    model.add(Dropout(0.25))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dropout(0.25))
+    model.add(Dense(1, activation='sigmoid'))
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+    return model
 
 
-def plot_train_val_acc(hist, points=epochs):
-    history_dict = hist.history
-    loss_values = history_dict['acc']
-    val_loss_values = history_dict['val_acc']
-    points = range(0, points)
-    plt.plot(points, loss_values, 'bo', label='Training acc')
-    plt.plot(points, val_loss_values, 'b', label='Validation acc')
-    plt.title('Training and validation acc')
-    plt.xlabel('Epochs')
-    plt.ylabel('Loss')
-    plt.legend()
+estimator = KerasClassifier(build_fn=create_baseline, epochs=20, batch_size=10, verbose=1)
+kfold = StratifiedKFold(n_splits=5, random_state=42, shuffle=False)
+results = cross_val_score(estimator, x_train, y_train, cv=kfold)
+print("Results: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
 
-    plt.show()
-
-
-plot_train_val_loss(history)
-plot_train_val_acc(history)
 exit(0)

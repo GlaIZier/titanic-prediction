@@ -8,7 +8,7 @@ import pylab as plot
 import tensorflow
 from keras import models, metrics
 from keras.legacy import layers
-from keras.layers import Dense
+from keras.layers import Dense, Dropout
 
 pd.options.display.max_columns = 100
 params = {
@@ -350,14 +350,15 @@ x_test = remove_unnecessary_params(proc_test)
 # show_data(x_test, 'x_test')
 
 model = models.Sequential()
-model.add(Dense(units=256, activation='relu', input_dim=x_train.shape[1]))
-model.add(Dense(units=64, activation='relu'))
-model.add(Dense(units=16, activation='relu'))
+model.add(Dense(units=16, activation='relu', input_dim=x_train.shape[1]))
+model.add(Dropout(0.25))
+model.add(Dense(units=4, activation='relu'))
+model.add(Dropout(0.25))
 model.add(Dense(1, activation='sigmoid'))
 
 model.compile(optimizer='rmsprop', loss='binary_crossentropy', metrics=['accuracy'])
 
-epochs = 300
+epochs = 500
 history = model.fit(x_train, y_train, epochs=epochs, batch_size=512, verbose=2, validation_data=[x_val, y_val])
 
 # 4. Model analysis
