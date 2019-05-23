@@ -19,16 +19,16 @@ class Data:
     raw_train = None
     raw_test = None
     train_border_index = None
+    validation_border_index = None
     engineered_train = None
     engineered_test = None
     x_train_full = None
     y_train_full = None
-    x_test = None
-    validation_border_index = None
     x_train = None
     y_train = None
     x_val = None
     y_val = None
+    x_test = None
 
 
 def status(feature):
@@ -289,8 +289,8 @@ def engineer_data():
     data.validation_border_index = validation_border_index
 
     combined = combine_data(raw_train, raw_test)
-    # show_data(combined, 'combined')
     combined = add_titles(combined)
+    combined = fill_empty_ages(combined)
     combined = refine_names(combined)
     combined = encode_sex(combined)
     combined = encode_cabins(combined)
@@ -300,4 +300,30 @@ def engineer_data():
     combined = fill_empty_embarked(combined)
     combined = add_family_size(combined)
     combined = remove_passenger_id(combined)
-    combined = predict_empty_ages(combined)
+
+    engineered_train, engineered_test = split_combined_data(combined)
+    data.engineered_train = engineered_train
+    data.engineered_test = engineered_train
+
+    x_train_full = remove_survived(engineered_train.iloc[validation_border_index:train_border_index])
+    x_train_full = remove_is_test(x_train_full)
+    y_train_full = extract_survived(engineered_train.iloc[validation_border_index:train_border_index])
+
+    x_train = x_train_full.iloc[validation_border_index:]
+    y_train = y_train_full.iloc[validation_border_index:]
+
+    x_val = x_train_full.iloc[:validation_border_index]
+    y_val = y_train_full.iloc[:validation_border_index]
+
+    x_test = remove_survived(engineered_test)
+    x_test = remove_is_test(x_test)
+
+    data.x_train_full = x_train_full
+    data.y_train_full = y_train_full
+    data.x_train = x_train
+    data.y_train = y_train
+    data.x_val = x_val
+    data.y_val = y_val
+    data.x_test = x_test
+
+    return data
