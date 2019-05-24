@@ -5,9 +5,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import pylab as plot
 
-import tensorflow
-from keras import models, metrics
-from keras.legacy import layers
+from keras import models
 from keras.layers import Dense, Dropout
 
 pd.options.display.max_columns = 100
