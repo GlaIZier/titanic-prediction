@@ -14,6 +14,7 @@ pd.options.display.max_columns = 100
 raw_train = pd.read_csv("data/train.csv")
 raw_test = pd.read_csv("data/test.csv")
 train_border_index = 891
+validation_border_index = 265
 
 
 def main():
@@ -25,8 +26,8 @@ def main():
     # 2. Feature engineering
     fe.raw_train = raw_train
     fe.raw_test = raw_test
-    fe.train_border_index = 891
-    fe.validation_border_index = 265
+    fe.train_border_index = train_border_index
+    fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
     # 3 Model development and prediction
