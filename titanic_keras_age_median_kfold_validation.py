@@ -31,7 +31,7 @@ def main():
     data = fe.engineer_data()
 
     # 3 Model development and prediction
-    def create_baseline():
+    def create_nn():
         model = models.Sequential()
         model.add(Dense(1024, input_dim=data.x_train_full.shape[1], activation='relu'))
         model.add(Dropout(0.25))
@@ -41,11 +41,12 @@ def main():
         model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
         return model
 
-    estimator = KerasClassifier(build_fn=create_baseline, epochs=20, batch_size=10, verbose=1)
+    estimator = KerasClassifier(build_fn=create_nn, epochs=20, batch_size=10, verbose=1)
     kfold = StratifiedKFold(n_splits=5, random_state=42, shuffle=False)
     results = cross_val_score(estimator, data.x_train_full, data.y_train_full, cv=kfold)
     print("Results: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
 
 
+# ~ 80%
 if __name__ == "__main__":
     main()

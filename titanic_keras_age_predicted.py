@@ -411,4 +411,6 @@ def plot_train_val_acc(hist, points=epochs):
 
 plot_train_val_loss(history)
 plot_train_val_acc(history)
+
+# ~ 80%
 exit(0)

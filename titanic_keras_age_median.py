@@ -46,5 +46,7 @@ def main():
     ma.plot_train_val_acc(history, epochs)
 
 
+# ~ 80%
 if __name__ == "__main__":
     main()
+
