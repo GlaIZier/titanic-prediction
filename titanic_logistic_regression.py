@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 
 import data_analysis as da
 import feature_engineering as fe
@@ -19,6 +19,14 @@ train_border_index = 891
 validation_border_index = 265
 
 
+# accuracy ~81
+def logistic_regression(data):
+    _logistic_regression = LogisticRegression()
+    _logistic_regression.fit(data.x_train, data.y_train)
+    _accuracy = _logistic_regression.score(data.x_val, data.y_val)
+    print(_accuracy)
+
+
 def main():
     # 1. Data analysis
     # da.show_data(raw_train, 'raw train set:')
@@ -32,28 +40,11 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    logistic_regression = LogisticRegression()
-    logistic_regression.fit(data.x_train, data.y_train)
-    y_pred = logistic_regression.predict(data.x_val)
-    a = logistic_regression.score(data.x_train, data.y_train)
+    model = LogisticRegressionCV(cv=5, random_state=0, multi_class='multinomial').fit(data.x_train, data.y_train)
+    a = model.score(data.x_val, data.y_val)
     print(a)
 
-    # # 3 Model development and prediction
-    # def create_baseline():
-    #     model = models.Sequential()
-    #     model.add(Dense(1024, input_dim=data.x_train_full.shape[1], activation='relu'))
-    #     model.add(Dropout(0.25))
-    #     model.add(Dense(128, activation='relu'))
-    #     model.add(Dropout(0.25))
-    #     model.add(Dense(1, activation='sigmoid'))
-    #     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
-    #     return model
-    #
-    # estimator = KerasClassifier(build_fn=create_baseline, epochs=20, batch_size=10, verbose=1)
-    # kfold = StratifiedKFold(n_splits=5, random_state=42, shuffle=False)
-    # results = cross_val_score(estimator, data.x_train_full, data.y_train_full, cv=kfold)
-    # print("Results: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
 
-
+# accuracy ~81
 if __name__ == "__main__":
     main()
