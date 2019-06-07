@@ -27,6 +27,13 @@ def logistic_regression(data):
     print(_accuracy)
 
 
+# accuracy ~81
+def logistic_regression_cross_validation(data):
+    model = LogisticRegressionCV(cv=5, random_state=0, multi_class='multinomial').fit(data.x_train, data.y_train)
+    accuracy = model.score(data.x_val, data.y_val)
+    print(accuracy)
+
+
 def main():
     # 1. Data analysis
     # da.show_data(raw_train, 'raw train set:')
@@ -40,9 +47,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    model = LogisticRegressionCV(cv=5, random_state=0, multi_class='multinomial').fit(data.x_train, data.y_train)
-    a = model.score(data.x_val, data.y_val)
-    print(a)
+    logistic_regression_cross_validation(data)
 
 
 # accuracy ~81
