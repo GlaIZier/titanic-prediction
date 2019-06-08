@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
+from sklearn.neighbors import KNeighborsClassifier
 
 import data_analysis as da
 import feature_engineering as fe
@@ -19,13 +20,12 @@ train_border_index = 891
 validation_border_index = 265
 
 
-# accuracy ~81
-def logistic_regression(data):
-    logistic_regression = LogisticRegression()
-    logistic_regression.fit(data.x_train, data.y_train)
-    accuracy = logistic_regression.score(data.x_val, data.y_val)
+# accuracy ~70
+def knn(data):
+    knn = KNeighborsClassifier(n_neighbors=5)
+    knn.fit(data.x_train, data.y_train)
+    accuracy = knn.score(data.x_val, data.y_val)
     print(accuracy)
-
 
 # accuracy ~81
 def logistic_regression_cross_validation(data):
@@ -47,7 +47,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    logistic_regression_cross_validation(data)
+    knn(data)
 
 
 # accuracy ~81
