@@ -4,12 +4,6 @@ from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
 import data_analysis as da
 import feature_engineering as fe
 
-from keras import models
-from keras.layers import Dense, Dropout
-from keras.wrappers.scikit_learn import KerasClassifier
-
-from sklearn.model_selection import cross_val_score, StratifiedKFold
-
 
 pd.options.display.max_columns = 100
 
