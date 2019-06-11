@@ -1,6 +1,6 @@
 import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import KFold
-from sklearn.neighbors import KNeighborsClassifier
 
 import data_analysis as da
 import feature_engineering as fe
@@ -14,20 +14,20 @@ train_border_index = 891
 validation_border_index = 265
 
 
-# accuracy ~70
-def knn_data(data):
-    accuracy = knn(data.x_train, data.y_train, data.x_val, data.y_val)
+# accuracy ~85
+def random_forest_data(data):
+    accuracy = random_forest(data.x_train, data.y_train, data.x_val, data.y_val)
     print(accuracy)
 
 
-def knn(x_train, y_train, x_val, y_val):
-    knn = KNeighborsClassifier(n_neighbors=5)
-    knn.fit(x_train, y_train)
-    return knn.score(x_val, y_val)
+def random_forest(x_train, y_train, x_val, y_val):
+    random_forest = RandomForestClassifier(n_estimators=100)
+    random_forest.fit(x_train, y_train)
+    return random_forest.score(x_val, y_val)
 
 
-# accuracy ~73
-def knn_cross_validation(data, splits=5):
+# accuracy ~83
+def random_forest_cross_validation(data, splits=5):
 
     kf = KFold(n_splits=splits)
     accuracy = 0
@@ -36,7 +36,7 @@ def knn_cross_validation(data, splits=5):
         y_train = data.y_train_full.iloc[train_indexes]
         x_val = data.x_train_full.iloc[val_indexes]
         y_val = data.y_train_full.iloc[val_indexes]
-        accuracy += knn(x_train, y_train, x_val, y_val)
+        accuracy += random_forest(x_train, y_train, x_val, y_val)
 
     return accuracy / splits
 
@@ -54,10 +54,10 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = knn_cross_validation(data)
+    accuracy = random_forest_cross_validation(data)
     print(accuracy)
 
 
-# accuracy ~73
+# accuracy ~83
 if __name__ == "__main__":
     main()
