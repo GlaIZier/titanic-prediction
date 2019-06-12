@@ -19,9 +19,9 @@ validation_border_index = 265
 
 def main():
     # 1. Data analysis
-    da.show_data(raw_train, 'raw train set:')
-    da.show_data(raw_test, 'raw test set: ')
-    da.analyze_training_data(raw_train)
+    # da.show_data(raw_train, 'raw train set:')
+    # da.show_data(raw_test, 'raw test set: ')
+    # da.analyze_training_data(raw_train)
 
     # 2. Feature engineering
     fe.raw_train = raw_train
@@ -31,6 +31,9 @@ def main():
     data = fe.engineer_data()
 
     # 3 Model development and prediction
+    nn_cross_validation(data)
+
+def nn_cross_validation(data):
     def create_nn():
         model = models.Sequential()
         model.add(Dense(1024, input_dim=data.x_train_full.shape[1], activation='relu'))
@@ -45,7 +48,6 @@ def main():
     kfold = StratifiedKFold(n_splits=5, random_state=42, shuffle=False)
     results = cross_val_score(estimator, data.x_train_full, data.y_train_full, cv=kfold)
     print("Results: %.2f%% (%.2f%%)" % (results.mean()*100, results.std()*100))
-
 
 # ~ 80%
 if __name__ == "__main__":
