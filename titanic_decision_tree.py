@@ -1,6 +1,5 @@
 import pandas as pd
 from sklearn.model_selection import KFold
-from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 
 import data_analysis as da
