@@ -1,4 +1,5 @@
 import pandas as pd
+from sklearn import tree
 from sklearn.model_selection import KFold
 from sklearn.tree import DecisionTreeClassifier
 
@@ -14,16 +15,22 @@ train_border_index = 891
 validation_border_index = 265
 
 
+def display_decision_tree(decision_tree_model, x):
+    with open("dtree.dot", 'w') as dotfile:
+        tree.export_graphviz(decision_tree_model, out_file=dotfile, feature_names=x.columns, class_names=True)
+
+
 # accuracy ~77
 def decision_tree_data(data):
     accuracy = decision_tree(data.x_train, data.y_train, data.x_val, data.y_val)
-    print(accuracy)
+    return accuracy
 
 
 def decision_tree(x_train, y_train, x_val, y_val):
-    knn = DecisionTreeClassifier()
-    knn.fit(x_train, y_train)
-    return knn.score(x_val, y_val)
+    decision_tree_model = DecisionTreeClassifier()
+    decision_tree_model.fit(x_train, y_train)
+    # display_decision_tree(decision_tree_model, x_train)
+    return decision_tree_model.score(x_val, y_val)
 
 
 # accuracy ~80
@@ -54,7 +61,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = decision_tree_cross_validation(data)
+    accuracy = decision_tree_data(data)
     print(accuracy)
 
 
