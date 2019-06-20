@@ -364,7 +364,6 @@ x_test = remove_is_test(x_test)
 # show_data(x_test, 'x_test')
 
 # Todo implement saving the best model
-# Todo implement with different models
 # Todo implement NN without feature engineering
 model = models.Sequential()
 model.add(Dense(units=8, activation='relu', input_dim=x_train.shape[1]))
