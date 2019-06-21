@@ -363,8 +363,11 @@ x_test = remove_is_test(x_test)
 # show_data(y_val, 'y_val')
 # show_data(x_test, 'x_test')
 
-# Todo implement saving the best model
-# Todo implement NN without feature engineering
+# Todo try different models
+# Todo analyse data with plots and pandas again
+# Todo implement saving the best model here
+# Todo implement NN and other models with less features
+# Todo implement NN and other models without feature engineering
 model = models.Sequential()
 model.add(Dense(units=8, activation='relu', input_dim=x_train.shape[1]))
 model.add(Dense(units=4, activation='relu'))
