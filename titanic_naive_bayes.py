@@ -14,7 +14,7 @@ validation_border_index = 265
 
 
 # accuracy ~81
-def logistic_regression(data):
+def naive_bayes(data):
     logistic_regression = LogisticRegression()
     logistic_regression.fit(data.x_train, data.y_train)
     accuracy = logistic_regression.score(data.x_val, data.y_val)
@@ -22,7 +22,7 @@ def logistic_regression(data):
 
 
 # accuracy ~81
-def logistic_regression_cross_validation(data):
+def naive_bayes_cross_validation(data):
     model = LogisticRegressionCV(cv=5, random_state=0, multi_class='multinomial').fit(data.x_train, data.y_train)
     accuracy = model.score(data.x_val, data.y_val)
     print(accuracy)
@@ -41,7 +41,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    logistic_regression_cross_validation(data)
+    naive_bayes_cross_validation(data)
 
 
 # accuracy ~81
