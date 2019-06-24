@@ -363,7 +363,7 @@ x_test = remove_is_test(x_test)
 # show_data(y_val, 'y_val')
 # show_data(x_test, 'x_test')
 
-# Todo try different models
+# Todo try different models (neural_network.MLPClassifier.html)
 # Todo analyse data with plots and pandas again
 # Todo implement saving the best model here
 # Todo implement NN and other models with less features

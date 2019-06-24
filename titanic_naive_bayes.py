@@ -1,5 +1,6 @@
 import pandas as pd
-from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
+from sklearn.linear_model import LogisticRegressionCV
+from sklearn.naive_bayes import GaussianNB
 
 import data_analysis as da
 import feature_engineering as fe
@@ -15,17 +16,16 @@ validation_border_index = 265
 
 # accuracy ~81
 def naive_bayes(data):
-    logistic_regression = LogisticRegression()
-    logistic_regression.fit(data.x_train, data.y_train)
-    accuracy = logistic_regression.score(data.x_val, data.y_val)
-    print(accuracy)
+    gaussian_naive_bayes = GaussianNB()
+    gaussian_naive_bayes.fit(data.x_train, data.y_train)
+    accuracy = gaussian_naive_bayes.score(data.x_val, data.y_val)
+    return accuracy
 
 
 # accuracy ~81
 def naive_bayes_cross_validation(data):
     model = LogisticRegressionCV(cv=5, random_state=0, multi_class='multinomial').fit(data.x_train, data.y_train)
-    accuracy = model.score(data.x_val, data.y_val)
-    print(accuracy)
+    return model.score(data.x_val, data.y_val)
 
 
 def main():
@@ -41,7 +41,8 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    naive_bayes_cross_validation(data)
+    accuracy = naive_bayes(data)
+    print(accuracy)
 
 
 # accuracy ~81
