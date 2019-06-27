@@ -20,20 +20,20 @@ def display_decision_tree(decision_tree_model, x):
         tree.export_graphviz(decision_tree_model, out_file=dotfile, feature_names=x.columns, class_names=True)
 
 
-# accuracy ~77
+# accuracy ~81
 def decision_tree_data(data):
     accuracy = decision_tree(data.x_train, data.y_train, data.x_val, data.y_val)
     return accuracy
 
 
 def decision_tree(x_train, y_train, x_val, y_val):
-    decision_tree_model = DecisionTreeClassifier()
+    decision_tree_model = DecisionTreeClassifier(criterion='entropy', max_depth=3, random_state=17)
     decision_tree_model.fit(x_train, y_train)
     # display_decision_tree(decision_tree_model, x_train)
     return decision_tree_model.score(x_val, y_val)
 
 
-# accuracy ~80
+# accuracy ~82
 def decision_tree_cross_validation(data, splits=5):
 
     kf = KFold(n_splits=splits)
@@ -61,7 +61,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = decision_tree_data(data)
+    accuracy = decision_tree_cross_validation(data)
     print(accuracy)
 
 
