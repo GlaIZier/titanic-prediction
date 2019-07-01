@@ -1,10 +1,8 @@
 import pandas as pd
 from sklearn.model_selection import KFold
-from sklearn.naive_bayes import GaussianNB, MultinomialNB, BernoulliNB
+from sklearn.svm import LinearSVC
 
-import data_analysis as da
 import feature_engineering as fe
-
 
 pd.options.display.max_columns = 100
 
@@ -14,21 +12,20 @@ train_border_index = 891
 validation_border_index = 265
 
 
-# accuracy ~50 (Gaussian), ~69 (Multinomial), ~79 (Bernoulli)
-def svn_data(data, classificator=GaussianNB()):
+# accuracy ~74 (LinearSVC), ~69 (Multinomial), ~79 (Bernoulli)
+def svn_data(data, classificator=LinearSVC()):
     accuracy = svn(data.x_train, data.y_train, data.x_val, data.y_val, classificator)
     return accuracy
 
 
-def svn(x_train, y_train, x_val, y_val, classificator=GaussianNB()):
+def svn(x_train, y_train, x_val, y_val, classificator=LinearSVC()):
     gaussian_naive_bayes = classificator
     gaussian_naive_bayes.fit(x_train, y_train)
     return gaussian_naive_bayes.score(x_val, y_val)
 
 
 # accuracy ~52 (Gaussian), ~73 (Multinomial), ~80 (Bernoulli)
-def svn_cross_validation(data, splits=5, classificator=GaussianNB()):
-
+def svn_cross_validation(data, splits=5, classificator=LinearSVC()):
     kf = KFold(n_splits=splits)
     accuracy = 0
     for train_indexes, val_indexes in kf.split(data.x_train_full):
@@ -54,9 +51,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    # accuracy = naive_bayes_cross_validation(data)
-    # accuracy = naive_bayes_cross_validation(data, classificator=MultinomialNB())
-    accuracy = svn_data(data, classificator=BernoulliNB())
+    accuracy = svn_data(data)
     print(accuracy)
 
 
