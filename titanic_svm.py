@@ -13,19 +13,19 @@ validation_border_index = 265
 
 
 # accuracy ~74 (LinearSVC), ~69 (Multinomial), ~79 (Bernoulli)
-def svn_data(data, classificator=LinearSVC()):
-    accuracy = svn(data.x_train, data.y_train, data.x_val, data.y_val, classificator)
+def svm_data(data, classificator=LinearSVC()):
+    accuracy = svm(data.x_train, data.y_train, data.x_val, data.y_val, classificator)
     return accuracy
 
 
-def svn(x_train, y_train, x_val, y_val, classificator=LinearSVC()):
+def svm(x_train, y_train, x_val, y_val, classificator=LinearSVC()):
     gaussian_naive_bayes = classificator
     gaussian_naive_bayes.fit(x_train, y_train)
     return gaussian_naive_bayes.score(x_val, y_val)
 
 
 # accuracy ~52 (Gaussian), ~73 (Multinomial), ~80 (Bernoulli)
-def svn_cross_validation(data, splits=5, classificator=LinearSVC()):
+def svm_cross_validation(data, splits=5, classificator=LinearSVC()):
     kf = KFold(n_splits=splits)
     accuracy = 0
     for train_indexes, val_indexes in kf.split(data.x_train_full):
@@ -33,7 +33,7 @@ def svn_cross_validation(data, splits=5, classificator=LinearSVC()):
         y_train = data.y_train_full.iloc[train_indexes]
         x_val = data.x_train_full.iloc[val_indexes]
         y_val = data.y_train_full.iloc[val_indexes]
-        accuracy += svn(x_train, y_train, x_val, y_val, classificator)
+        accuracy += svm(x_train, y_train, x_val, y_val, classificator)
 
     return accuracy / splits
 
@@ -51,7 +51,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = svn_data(data)
+    accuracy = svm_data(data)
     print(accuracy)
 
 
