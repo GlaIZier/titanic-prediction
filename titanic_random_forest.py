@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score
 
 import data_analysis as da
 import feature_engineering as fe
@@ -27,7 +27,7 @@ def random_forest(x_train, y_train, x_val, y_val):
 
 
 # accuracy ~83
-def random_forest_cross_validation(data, splits=5):
+def random_forest_cross_validation_manual(data, splits=5):
 
     kf = KFold(n_splits=splits)
     accuracy = 0
@@ -39,6 +39,15 @@ def random_forest_cross_validation(data, splits=5):
         accuracy += random_forest(x_train, y_train, x_val, y_val)
 
     return accuracy / splits
+
+
+# accuracy ~82
+def random_forest_cross_validation(data, splits=5):
+
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    rfc = RandomForestClassifier(random_state=42, n_jobs=-1, oob_score=True)
+    results = cross_val_score(rfc, data.x_train_full, data.y_train_full, cv=skf)
+    return results.mean()
 
 
 def main():
