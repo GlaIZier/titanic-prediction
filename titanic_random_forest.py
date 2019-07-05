@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score
+from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score, GridSearchCV
 
 import data_analysis as da
 import feature_engineering as fe
@@ -41,13 +41,28 @@ def random_forest_cross_validation_manual(data, splits=5):
     return accuracy / splits
 
 
-# accuracy ~82
-def random_forest_cross_validation(data, splits=5):
+# accuracy ~82- ~84 (with best params)
+def random_forest_cross_validation(data, splits=5, model_params=None):
 
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-    rfc = RandomForestClassifier(random_state=42, n_jobs=-1, oob_score=True)
+    rfc = RandomForestClassifier(random_state=42, n_jobs=-1, oob_score=True) if model_params is None else \
+        RandomForestClassifier(n_estimators=model_params['n_estimators'], max_depth=model_params['max_depth'],
+                               max_features=model_params['max_features'],
+                               min_samples_leaf=model_params['min_samples_leaf'],
+                               random_state=42, n_jobs=-1, oob_score=True)
     results = cross_val_score(rfc, data.x_train_full, data.y_train_full, cv=skf)
     return results.mean()
+
+
+def choose_best_params(data, splits=5):
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    parameters = {'n_estimators': [25, 50, 75, 100, 150, 200, 500], 'max_features': [4, 7, 10, 13],
+                  'min_samples_leaf': [1, 3, 5, 7], 'max_depth': [5, 10, 15, 20]}
+    rfc = RandomForestClassifier(random_state=42,
+                                 n_jobs=-1, oob_score=True)
+    gcv = GridSearchCV(rfc, parameters, n_jobs=-1, cv=skf, verbose=1)
+    gcv.fit(data.x_train_full, data.y_train_full)
+    return gcv.best_params_
 
 
 def main():
@@ -63,7 +78,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = random_forest_cross_validation(data)
+    accuracy = random_forest_cross_validation(data, model_params=choose_best_params(data))
     print(accuracy)
 
 
