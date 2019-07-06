@@ -24,7 +24,7 @@ def svm(x_train, y_train, x_val, y_val, classificator=LinearSVC()):
     return gaussian_naive_bayes.score(x_val, y_val)
 
 
-# accuracy ~52 (Gaussian), ~73 (Multinomial), ~80 (Bernoulli)
+# accuracy ~80 (LinearSVC), ~73 (Multinomial), ~80 (Bernoulli)
 def svm_cross_validation(data, splits=5, classificator=LinearSVC()):
     kf = KFold(n_splits=splits)
     accuracy = 0
@@ -51,7 +51,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = svm_data(data)
+    accuracy = svm_cross_validation(data)
     print(accuracy)
 
 
