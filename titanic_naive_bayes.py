@@ -15,19 +15,19 @@ validation_border_index = 265
 
 
 # accuracy ~50 (Gaussian), ~69 (Multinomial), ~79 (Bernoulli)
-def naive_bayes_data(data, classificator=GaussianNB()):
-    accuracy = naive_bayes(data.x_train, data.y_train, data.x_val, data.y_val, classificator)
+def naive_bayes_data(data, classifier=GaussianNB()):
+    accuracy = naive_bayes(data.x_train, data.y_train, data.x_val, data.y_val, classifier)
     return accuracy
 
 
-def naive_bayes(x_train, y_train, x_val, y_val, classificator=GaussianNB()):
-    gaussian_naive_bayes = classificator
+def naive_bayes(x_train, y_train, x_val, y_val, classifier=GaussianNB()):
+    gaussian_naive_bayes = classifier
     gaussian_naive_bayes.fit(x_train, y_train)
     return gaussian_naive_bayes.score(x_val, y_val)
 
 
 # accuracy ~52 (Gaussian), ~73 (Multinomial), ~80 (Bernoulli)
-def naive_bayes_cross_validation(data, splits=5, classificator=GaussianNB()):
+def naive_bayes_cross_validation(data, splits=5, classifier=GaussianNB()):
 
     kf = KFold(n_splits=splits)
     accuracy = 0
@@ -36,7 +36,7 @@ def naive_bayes_cross_validation(data, splits=5, classificator=GaussianNB()):
         y_train = data.y_train_full.iloc[train_indexes]
         x_val = data.x_train_full.iloc[val_indexes]
         y_val = data.y_train_full.iloc[val_indexes]
-        accuracy += naive_bayes(x_train, y_train, x_val, y_val, classificator)
+        accuracy += naive_bayes(x_train, y_train, x_val, y_val, classifier)
 
     return accuracy / splits
 
@@ -56,7 +56,7 @@ def main():
 
     # accuracy = naive_bayes_cross_validation(data)
     # accuracy = naive_bayes_cross_validation(data, classificator=MultinomialNB())
-    accuracy = naive_bayes_data(data, classificator=BernoulliNB())
+    accuracy = naive_bayes_data(data, classifier=BernoulliNB())
     print(accuracy)
 
 
