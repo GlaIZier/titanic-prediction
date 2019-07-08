@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.model_selection import KFold, StratifiedKFold
+from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score
 from sklearn.svm import LinearSVC
 
 import feature_engineering as fe
@@ -25,7 +25,7 @@ def svm(x_train, y_train, x_val, y_val, classifier=LinearSVC()):
 
 
 # accuracy ~80 (LinearSVC), ~73 (Multinomial), ~80 (Bernoulli)
-def svm_cross_validation(data, splits=5, classifier=LinearSVC()):
+def svm_cross_validation_manual(data, splits=5, classifier=LinearSVC()):
     kf = KFold(n_splits=splits)
     accuracy = 0
     for train_indexes, val_indexes in kf.split(data.x_train_full):
@@ -38,16 +38,11 @@ def svm_cross_validation(data, splits=5, classifier=LinearSVC()):
     return accuracy / splits
 
 
-# # accuracy ~82- ~84 (with best params)
-# def random_forest_cross_validation(data, splits=5, classificator model_params=None):
-#     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-#     rfc = RandomForestClassifier(random_state=42, n_jobs=-1, oob_score=True) if model_params is None else \
-#         RandomForestClassifier(n_estimators=model_params['n_estimators'], max_depth=model_params['max_depth'],
-#                                max_features=model_params['max_features'],
-#                                min_samples_leaf=model_params['min_samples_leaf'],
-#                                random_state=42, n_jobs=-1, oob_score=True)
-#     results = cross_val_score(rfc, data.x_train_full, data.y_train_full, cv=skf)
-#     return results.mean()
+# accuracy ~79 (LinearSVC)
+def svm_cross_validation(data, splits=5, classifier=LinearSVC()):
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    results = cross_val_score(classifier, data.x_train_full, data.y_train_full, cv=skf)
+    return results.mean()
 
 
 def main():
