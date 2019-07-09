@@ -363,10 +363,10 @@ x_test = remove_is_test(x_test)
 # show_data(y_val, 'y_val')
 # show_data(x_test, 'x_test')
 
-# Todo try different models (neural_network.MLPClassifier.html, ExtraTreesClassifier)
+# Todo try different models (neural_network.MLPClassifier.html, ExtraTreesClassifier, SGDClassifier)
 # Todo try bagging and boosting
-# Todo analyse data with plots and pandas again
-# Todo implement saving the best model here
+# Todo analyse data with plots and pandas again (SequentialFeatureSelector)
+# Todo implement saving the best model here (SelectFromModel, make_pipeline)
 # Todo implement NN and other models with less features
 # Todo implement NN and other models without feature engineering
 # Todo reach 90%
