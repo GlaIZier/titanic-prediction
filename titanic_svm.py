@@ -38,7 +38,7 @@ def svm_cross_validation_manual(data, splits=5, kernel='linear'):
     return accuracy / splits
 
 
-# accuracy ~83 (linear)
+# accuracy ~83 (linear); 79 (poly); 73 (rbf); 61 (sigmoid)
 def svm_cross_validation(data, splits=5, kernel='linear'):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     results = cross_val_score(SVC(kernel=kernel), data.x_train_full, data.y_train_full, cv=skf)
@@ -58,10 +58,9 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = svm_cross_validation(data)
+    accuracy = svm_cross_validation(data, kernel='poly')
     print(accuracy)
 
 
-# accuracy ~52 - ~80
 if __name__ == "__main__":
     main()
