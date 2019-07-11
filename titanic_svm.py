@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score
+from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score, GridSearchCV
 from sklearn.svm import SVC
 
 import feature_engineering as fe
@@ -43,6 +43,16 @@ def svm_cross_validation(data, splits=5, kernel='linear'):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     results = cross_val_score(SVC(kernel=kernel), data.x_train_full, data.y_train_full, cv=skf)
     return results.mean()
+
+
+def choose_best_params(data, splits=5):
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    parameters = {'kernel': ['linear', 'poly', 'rbf', 'sigmoid'], 'max_features': [4, 7, 10, 13],
+                  'min_samples_leaf': [1, 3, 5, 7], 'max_depth': [5, 10, 15, 20]}
+    classifier = SVC(random_state=42)
+    gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
+    gcv.fit(data.x_train_full, data.y_train_full)
+    return gcv.best_params_
 
 
 def main():
