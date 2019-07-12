@@ -370,6 +370,7 @@ x_test = remove_is_test(x_test)
 # Todo implement NN and other models with less features
 # Todo implement NN and other models without feature engineering
 # Todo reach 90%
+# Todo try pca to represent data and see the decision boundary
 model = models.Sequential()
 model.add(Dense(units=8, activation='relu', input_dim=x_train.shape[1]))
 model.add(Dense(units=4, activation='relu'))
