@@ -55,7 +55,16 @@ def choose_best_params(data, splits=5):
     print(gcv.best_score_)
     return gcv.best_params_
 
+
 # add choose best params degree poly
+def choose_best_params_poly(data, splits=5):
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    parameters = {'degree': [1, 2, 4, 6, 8]}
+    classifier = SVC(random_state=42, kernel='poly')
+    gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
+    gcv.fit(data.x_train_full, data.y_train_full)
+    print(gcv.best_score_)
+    return gcv.best_params_
 
 
 def main():
