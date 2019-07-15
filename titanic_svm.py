@@ -45,26 +45,28 @@ def svm_cross_validation(data, splits=5, kernel='linear'):
     return results.mean()
 
 
-def choose_best_params(data, splits=5):
+# accuracy ~81 (rbf, C = 10, gamma = 0.001)
+def svm_cross_validation_best_params_rbf_sigmoid(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-    parameters = {'kernel': ['linear', 'poly', 'rbf', 'sigmoid'], 'C': [0.001, 0.01, 0.1, 1, 10],
-                  'gamma': [0.001, 0.01, 0.1, 1, 10]}
+    parameters = {'kernel': ['rbf', 'sigmoid'], 'C': [0.01, 0.1, 1, 10, 50],
+                  'gamma': [0.0001, 0.001, 0.01, 0.1, 1, 10]}
     classifier = SVC(random_state=42)
     gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
     gcv.fit(data.x_train_full, data.y_train_full)
-    print(gcv.best_score_)
-    return gcv.best_params_
+    print(gcv.best_params_)
+    return gcv.best_score_
 
 
-# add choose best params degree poly
-def choose_best_params_poly(data, splits=5):
+#
+def svm_cross_validation_best_params_poly(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-    parameters = {'degree': [1, 2, 4, 6, 8]}
+    parameters = {'degree': [1, 2, 4, 6, 8, 10], 'C': [0.01, 0.1, 1, 10, 50],
+                  'gamma': [0.0001, 0.001, 0.01, 0.1, 1, 10]}
     classifier = SVC(random_state=42, kernel='poly')
     gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
     gcv.fit(data.x_train_full, data.y_train_full)
-    print(gcv.best_score_)
-    return gcv.best_params_
+    print(gcv.best_params_)
+    return gcv.best_score_
 
 
 def main():
@@ -80,7 +82,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = choose_best_params(data)
+    accuracy = svm_cross_validation_best_params_poly(data)
     print(accuracy)
 
 
