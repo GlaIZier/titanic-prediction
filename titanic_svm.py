@@ -57,13 +57,13 @@ def svm_cross_validation_best_params_rbf_sigmoid(data, splits=5):
     return gcv.best_score_
 
 
-#
+# C = 0.1, 1, 0.01
 def svm_cross_validation_best_params_poly(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     parameters = {'degree': [1, 2, 4, 6, 8, 10], 'C': [0.01, 0.1, 1, 10, 50],
                   'gamma': [0.0001, 0.001, 0.01, 0.1, 1, 10]}
     classifier = SVC(random_state=42, kernel='poly')
-    gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
+    gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=3)
     gcv.fit(data.x_train_full, data.y_train_full)
     print(gcv.best_params_)
     return gcv.best_score_
