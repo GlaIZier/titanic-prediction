@@ -77,6 +77,17 @@ def svm_cross_validation_poly_with_best_params(data, splits=5):
     return results.mean()
 
 
+def svm_cross_validation_best_params_linear(data, splits=5):
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    parameters = {'C': [0.01, 0.1, 1, 10, 50],
+                  'gamma': [0.0001, 0.001, 0.01, 0.1, 1, 10]}
+    classifier = SVC(random_state=42, kernel='linear')
+    gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=3)
+    gcv.fit(data.x_train_full, data.y_train_full)
+    print(gcv.best_params_)
+    return gcv.best_score_
+
+
 def main():
     # 1. Data analysis
     # da.show_data(raw_train, 'raw train set:')
@@ -90,7 +101,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = svm_cross_validation_poly_with_best_params(data)
+    accuracy = svm_cross_validation_best_params_linear(data)
     print(accuracy)
 
 
