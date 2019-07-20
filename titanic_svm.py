@@ -77,6 +77,7 @@ def svm_cross_validation_poly_with_best_params(data, splits=5):
     return results.mean()
 
 
+# accuracy 83% C=0.1, gamma = 0.0001
 def svm_cross_validation_best_params_linear(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     parameters = {'C': [0.01, 0.1, 1, 10, 50],
