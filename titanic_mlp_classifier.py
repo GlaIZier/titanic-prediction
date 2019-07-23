@@ -14,40 +14,36 @@ train_border_index = 891
 validation_border_index = 265
 
 
-# accuracy ~85
+# accuracy ~79
 def mlp_data(data):
-    accuracy = mlp(data.x_train, data.y_train, data.x_val, data.y_val)
-    print(accuracy)
+    return mlp(data.x_train, data.y_train, data.x_val, data.y_val)
 
 
 def mlp(x_train, y_train, x_val, y_val):
-    random_forest = MLPClassifier(n_estimators=100)
-    random_forest.fit(x_train, y_train)
-    return random_forest.score(x_val, y_val)
+    classifier = MLPClassifier(random_state=42)
+    classifier.fit(x_train, y_train)
+    return classifier.score(x_val, y_val)
 
 
-# accuracy ~83
-def mlp_cross_validation(data, splits=5, model_params=None):
-
+# accuracy ~82.6
+def mlp_cross_validation(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-    classifier = MLPClassifier(random_state=42) if model_params is None else \
-        MLPClassifier(n_estimators=model_params['n_estimators'], max_depth=model_params['max_depth'],
-                               max_features=model_params['max_features'],
-                               min_samples_leaf=model_params['min_samples_leaf'],
-                               random_state=42, n_jobs=-1, oob_score=True)
+    classifier = MLPClassifier(random_state=42)
     results = cross_val_score(classifier, data.x_train_full, data.y_train_full, cv=skf)
     return results.mean()
 
 
-def choose_best_params(data, splits=5):
+# accuracy ~83.4
+def mlp_cross_validation_best_params(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-    parameters = {'n_estimators': [25, 50, 75, 100, 150, 200, 500], 'max_features': [4, 7, 10, 13],
-                  'min_samples_leaf': [1, 3, 5, 7], 'max_depth': [5, 10, 15, 20]}
-    classifier = MLPClassifier(random_state=42,
-                                 n_jobs=-1, oob_score=True)
-    gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
+    parameters = {'hidden_layer_sizes': [(512, ), (128, ), (16, ), (512, 64, ), (128, 16), (16, 4)],
+                  'alpha': [0.00001, 0.0001, 0.001, 0.01, 0.1, 1], 'max_iter': [50, 100, 200, 400, 750, 1000],
+                  'early_stopping': [False, True]}
+    classifier = MLPClassifier(random_state=42)
+    gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=3)
     gcv.fit(data.x_train_full, data.y_train_full)
-    return gcv.best_params_
+    print(gcv.best_params_)
+    return gcv.best_score_
 
 
 def main():
@@ -63,7 +59,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = mlp_cross_validation(data)
+    accuracy = mlp_cross_validation_best_params(data)
     print(accuracy)
 
 
