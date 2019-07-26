@@ -15,7 +15,7 @@ validation_border_index = 265
 
 
 # accuracy ~79
-def mlp_data(data):
+def extra_trees_data(data):
     return mlp(data.x_train, data.y_train, data.x_val, data.y_val)
 
 
