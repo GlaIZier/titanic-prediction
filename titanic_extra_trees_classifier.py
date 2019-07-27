@@ -1,10 +1,8 @@
 import pandas as pd
+from sklearn.model_selection import StratifiedKFold, cross_val_score, GridSearchCV
 from sklearn.neural_network import MLPClassifier
-from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score, GridSearchCV
 
-import data_analysis as da
 import feature_engineering as fe
-
 
 pd.options.display.max_columns = 100
 
