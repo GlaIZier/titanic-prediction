@@ -14,10 +14,10 @@ validation_border_index = 265
 
 # accuracy ~79
 def extra_trees_data(data):
-    return mlp(data.x_train, data.y_train, data.x_val, data.y_val)
+    return extra_trees(data.x_train, data.y_train, data.x_val, data.y_val)
 
 
-def mlp(x_train, y_train, x_val, y_val):
+def extra_trees(x_train, y_train, x_val, y_val):
     classifier = MLPClassifier(random_state=42)
     classifier.fit(x_train, y_train)
     return classifier.score(x_val, y_val)
