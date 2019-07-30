@@ -363,7 +363,7 @@ x_test = remove_is_test(x_test)
 # show_data(y_val, 'y_val')
 # show_data(x_test, 'x_test')
 
-# Todo try different models (ExtraTreesClassifier, SGDClassifier, LDA, QDA)
+# Todo try different models (LDA, QDA)
 # Todo try bagging and boosting (xgboost)
 # Todo analyse data with plots and pandas again (SequentialFeatureSelector)
 # Todo implement saving the best model here (SelectFromModel, make_pipeline)

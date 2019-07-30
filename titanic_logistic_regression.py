@@ -1,5 +1,6 @@
 import pandas as pd
-from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
+from sklearn.linear_model import LogisticRegression, LogisticRegressionCV, SGDClassifier
+from sklearn.model_selection import StratifiedKFold, cross_val_score
 
 import data_analysis as da
 import feature_engineering as fe
@@ -28,6 +29,14 @@ def logistic_regression_cross_validation(data):
     print(accuracy)
 
 
+# accuracy ~68
+def logistic_regression_sgd_cross_validation(data, splits=5):
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    results = cross_val_score(SGDClassifier(random_state=42),
+                              data.x_train_full, data.y_train_full, cv=skf)
+    return results.mean()
+
+
 def main():
     # 1. Data analysis
     # da.show_data(raw_train, 'raw train set:')
@@ -42,6 +51,7 @@ def main():
     data = fe.engineer_data()
 
     logistic_regression_cross_validation(data)
+    print(logistic_regression_sgd_cross_validation(data))
 
 
 # accuracy ~81
