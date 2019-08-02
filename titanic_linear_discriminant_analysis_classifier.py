@@ -1,6 +1,5 @@
 import pandas as pd
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
-from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score, GridSearchCV
 
 import feature_engineering as fe
@@ -32,12 +31,10 @@ def lda_cross_validation(data, splits=5):
     return results.mean()
 
 
-# accuracy ~
+# accuracy ~82
 def lda_cross_validation_best_params(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-    parameters = {'solver': ['svd', 'lsqr', 'eigen'],
-                  'shrinkage': [None, 'auto', 0.0, 0.1, 0.25, 0.5, 0.75, 1.0],
-                  'n_components': [1, 2, 3, 5, 7, 10, 20, 40, 50]}
+    parameters = {'n_components': [1, 2, 3, 5, 7, 10, 20, 40, 50]}
     classifier = LinearDiscriminantAnalysis()
     gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
     gcv.fit(data.x_train_full, data.y_train_full)
@@ -58,10 +55,10 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    # accuracy = lda_cross_validation_best_params(data)
-    # print(accuracy)
+    accuracy = lda_cross_validation_best_params(data)
+    print(accuracy)
 
 
-# accuracy
+# accuracy ~82
 if __name__ == "__main__":
     main()
