@@ -1,6 +1,7 @@
 import pandas as pd
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score, GridSearchCV
+from xgboost import XGBClassifier
 
 import feature_engineering as fe
 
@@ -12,18 +13,18 @@ train_border_index = 891
 validation_border_index = 265
 
 
-# accuracy ~83
-def extra_trees_data(data):
-    return extra_trees(data.x_train, data.y_train, data.x_val, data.y_val)
+# accuracy ~82
+def xgboost_data(data):
+    return xgboost(data.x_train, data.y_train, data.x_val, data.y_val)
 
 
-def extra_trees(x_train, y_train, x_val, y_val):
-    classifier = ExtraTreesClassifier(random_state=42)
+def xgboost(x_train, y_train, x_val, y_val):
+    classifier = XGBClassifier()
     classifier.fit(x_train, y_train)
     return classifier.score(x_val, y_val)
 
 
-# accuracy ~82
+# accuracy
 def extra_trees_cross_validation(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     classifier = ExtraTreesClassifier(random_state=42)
@@ -31,7 +32,7 @@ def extra_trees_cross_validation(data, splits=5):
     return results.mean()
 
 
-# accuracy ~84.6
+# accuracy
 def extra_trees_cross_validation_best_params(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     parameters = {'n_estimators': [2, 5, 10, 25, 50, 100, 250, 500],
@@ -57,10 +58,10 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = extra_trees_cross_validation_best_params(data)
+    accuracy = xgboost_data(data)
     print(accuracy)
 
 
-# accuracy ~84.6
+# accuracy
 if __name__ == "__main__":
     main()
