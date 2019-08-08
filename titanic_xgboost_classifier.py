@@ -24,10 +24,10 @@ def xgboost(x_train, y_train, x_val, y_val):
     return classifier.score(x_val, y_val)
 
 
-# accuracy
-def extra_trees_cross_validation(data, splits=5):
+# accuracy ~81
+def xgboost_cross_validation(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-    classifier = ExtraTreesClassifier(random_state=42)
+    classifier = XGBClassifier()
     results = cross_val_score(classifier, data.x_train_full, data.y_train_full, cv=skf)
     return results.mean()
 
@@ -58,7 +58,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = xgboost_data(data)
+    accuracy = xgboost_cross_validation(data)
     print(accuracy)
 
 
