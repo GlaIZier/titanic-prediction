@@ -32,13 +32,12 @@ def xgboost_cross_validation(data, splits=5):
     return results.mean()
 
 
-# accuracy
+# accuracy ~83.7
 def extra_trees_cross_validation_best_params(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-    parameters = {'n_estimators': [2, 5, 10, 25, 50, 100, 250, 500],
-                  'max_depth': [1, 2, 5, 7, 10, 15, 20, 50, 100, None], 'min_samples_split': [2, 3, 4, 5, 6, 7, 8, 10,
-                                                                                              15]}
-    classifier = ExtraTreesClassifier(random_state=42)
+    parameters = {'n_estimators': [2, 5, 10, 25, 50, 100, 250, 500], 'max_depth': [1, 2, 3, 4, 5, 7, 10, 15, 20, 50],
+                  'learning_rate': [0.001, 0.01, 0.1, 0.5, 1], 'booster': ['gbtree', 'gblinear', 'dart']}
+    classifier = XGBClassifier()
     gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
     gcv.fit(data.x_train_full, data.y_train_full)
     print(gcv.best_params_)
@@ -58,7 +57,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = xgboost_cross_validation(data)
+    accuracy = extra_trees_cross_validation_best_params(data)
     print(accuracy)
 
 
