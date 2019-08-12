@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.ensemble import ExtraTreesClassifier, GradientBoostingClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score, GridSearchCV
 from xgboost import XGBClassifier
 
@@ -44,6 +44,19 @@ def extra_trees_cross_validation_best_params(data, splits=5):
     return gcv.best_score_
 
 
+# accuracy ~83.4
+def gradient_boosting_cross_validation_best_params(data, splits=5):
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    parameters = {'n_estimators': [2, 5, 10, 25, 50, 100, 250, 500], 'max_depth': [1, 2, 3, 4, 5, 7, 10, 15, 20, 50],
+                  'learning_rate': [0.001, 0.01, 0.1, 0.5, 1]}
+    classifier = GradientBoostingClassifier()
+    gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
+    gcv.fit(data.x_train_full, data.y_train_full)
+    print(gcv.best_params_)
+    return gcv.best_score_
+
+
+# accuracy ~83.7
 def main():
     # 1. Data analysis
     # da.show_data(raw_train, 'raw train set:')
@@ -57,7 +70,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = extra_trees_cross_validation_best_params(data)
+    accuracy = gradient_boosting_cross_validation_best_params(data)
     print(accuracy)
 
 
