@@ -1,3 +1,4 @@
+### To install
 To install global dependencies if they are needed:
 ```
 sudo apt-get install python3.6-tk
@@ -13,3 +14,21 @@ To deactivate:
 deactivate
 ```
 
+
+### Model performance
+|  Model | CV  | CV with best params  |
+|---|---|---|
+| Decision tree |   |   |
+| Extra trees  |   |   |
+| K Neighbors |   |   |
+|   |   |   |
+|   |   |   |
+|   |   |   |
+|   |   |   |
+|   |   |   |
+|   |   |   |
+|   |   |   |
+|   |   |   |
+|   |   |   |
+|   |   |   |
+|   |   |   |
