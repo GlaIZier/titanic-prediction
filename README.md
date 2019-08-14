@@ -20,15 +20,15 @@ deactivate
 |---|---|---|
 | Decision tree |   |   |
 | Extra trees  |   |   |
-| K Neighbors |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
-|   |   |   |
+| K-nearest neighbors |   |   |
+| Linear discriminant analysis  |   |   |
+| Linear regression  |   |   |
+| Logistic regression  |   |   |
+| Multi-layer perceptron  |   |   |
+| Naive bayes  |   |   |
+| Neural network Keras  |   |   |
+| Neural network Keras with age prediction  |   |   |
+| Quadratic discriminant analysis  |   |   |
+| Random forest  |   |   |
+| Support vector machines  |   |   |
+| Xgboost classifier  |   |   |
