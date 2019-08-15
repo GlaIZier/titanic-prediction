@@ -18,9 +18,9 @@ deactivate
 ### Model performance
 |  Model | CV  | CV with best params  |
 |---|---|---|
-| Decision tree |   |   |
-| Extra trees  |   |   |
-| K-nearest neighbors |   |   |
+| Decision tree |  82 |   |
+| Extra trees  |  82 |  84.6 |
+| K-nearest neighbors | 73  |   |
 | Linear discriminant analysis  |   |   |
 | Linear regression  |   |   |
 | Logistic regression  |   |   |
