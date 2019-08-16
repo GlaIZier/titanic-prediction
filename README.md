@@ -21,7 +21,7 @@ deactivate
 | Decision tree |  82 |   |
 | Extra trees  |  82 |  84.6 |
 | K-nearest neighbors | 73  |   |
-| Linear discriminant analysis  |   |   |
+| Linear discriminant analysis  | 82  | 82  |
 | Linear regression  |   |   |
 | Logistic regression  |   |   |
 | Multi-layer perceptron  |   |   |
