@@ -22,7 +22,7 @@ deactivate
 | Extra trees  |  82 |  84.6 |
 | K-nearest neighbors | 73  |   |
 | Linear discriminant analysis  | 82  | 82  |
-| Linear regression  |   |   |
+| Linear regression  |  83 |   |
 | Logistic regression  |   |   |
 | Multi-layer perceptron  |   |   |
 | Naive bayes  |   |   |
