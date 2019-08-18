@@ -23,7 +23,7 @@ deactivate
 | K-nearest neighbors | 73  |   |
 | Linear discriminant analysis  | 82  | 82  |
 | Linear regression  |  83 |   |
-| Logistic regression  |   |   |
+| Logistic regression  | 81  |   |
 | Multi-layer perceptron  |   |   |
 | Naive bayes  |   |   |
 | Neural network Keras  |   |   |
