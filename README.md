@@ -26,7 +26,7 @@ deactivate
 | Logistic regression  | 81  |   |
 | Multi-layer perceptron  | 82.6  | 83.4  |
 | Naive bayes  |  80 |   |
-| Neural network Keras  |   |   |
+| Neural network Keras  | 80  |   |
 | Neural network Keras with age prediction  |   |   |
 | Quadratic discriminant analysis  |   |   |
 | Random forest  |   |   |
