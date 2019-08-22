@@ -27,7 +27,7 @@ deactivate
 | Multi-layer perceptron  | 82.6  | 83.4  |
 | Naive bayes  |  80 |   |
 | Neural network Keras  | 80  |   |
-| Neural network Keras with age prediction  |   |   |
+| Neural network Keras with age prediction  | 80  |   |
 | Quadratic discriminant analysis  |   |   |
 | Random forest  |   |   |
 | Support vector machines  |   |   |
