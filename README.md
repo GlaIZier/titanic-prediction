@@ -28,7 +28,7 @@ deactivate
 | Naive bayes  |  80 |   |
 | Neural network Keras  | 80  |   |
 | Neural network Keras with age prediction  | 80  |   |
-| Quadratic discriminant analysis  |   |   |
+| Quadratic discriminant analysis  |  47 | 47  |
 | Random forest  |   |   |
 | Support vector machines  |   |   |
 | Xgboost classifier  |   |   |
