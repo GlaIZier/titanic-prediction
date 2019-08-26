@@ -30,5 +30,5 @@ deactivate
 | Neural network Keras with age prediction  | 80  |   |
 | Quadratic discriminant analysis  |  47 | 47  |
 | Random forest  | 83  | 84  |
-| Support vector machines  |   |   |
+| Support vector machines  | 81  |   |
 | Xgboost classifier  |   |   |
