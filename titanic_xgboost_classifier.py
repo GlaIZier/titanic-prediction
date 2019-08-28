@@ -33,7 +33,7 @@ def xgboost_cross_validation(data, splits=5):
 
 
 # accuracy ~83.7
-def extra_trees_cross_validation_best_params(data, splits=5):
+def xgboost_cross_validation_best_params(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     parameters = {'n_estimators': [2, 5, 10, 25, 50, 100, 250, 500], 'max_depth': [1, 2, 3, 4, 5, 7, 10, 15, 20, 50],
                   'learning_rate': [0.001, 0.01, 0.1, 0.5, 1], 'booster': ['gbtree', 'gblinear', 'dart']}
