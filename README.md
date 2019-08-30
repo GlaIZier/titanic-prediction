@@ -31,4 +31,4 @@ deactivate
 | Quadratic discriminant analysis  |  47 | 47  |
 | Random forest  | 83  | 84  |
 | Support vector machines  | 81  | 83  |
-| Xgboost classifier  |  81 |   |
+| Xgboost classifier  |  81 | 83.7  |
