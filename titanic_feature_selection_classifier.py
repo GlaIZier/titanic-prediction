@@ -31,7 +31,7 @@ def extra_trees_cross_validation(data, splits=5):
     return results.mean()
 
 
-# accuracy ~84.6
+# accuracy ~84.6 : 5, 10, 8
 def extra_trees_cross_validation_best_params(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     parameters = {'n_estimators': [2, 5, 10, 25, 50, 100, 250, 500],
