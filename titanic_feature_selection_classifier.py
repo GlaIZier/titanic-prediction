@@ -44,6 +44,14 @@ def extra_trees_cross_validation_best_params(data, splits=5):
     return gcv.best_score_
 
 
+# accuracy ~82
+def extra_trees_feature_selection(data, splits=5):
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    classifier = ExtraTreesClassifier(random_state=42)
+    results = cross_val_score(classifier, data.x_train_full, data.y_train_full, cv=skf)
+    return results.mean()
+
+
 def main():
     # 1. Data analysis
     # da.show_data(raw_train, 'raw train set:')
