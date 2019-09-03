@@ -1,5 +1,6 @@
 import pandas as pd
 from sklearn.ensemble import ExtraTreesClassifier
+from sklearn.feature_selection import SelectFromModel
 from sklearn.model_selection import StratifiedKFold, cross_val_score, GridSearchCV
 
 import feature_engineering as fe
@@ -44,11 +45,19 @@ def extra_trees_cross_validation_best_params(data, splits=5):
     return gcv.best_score_
 
 
-# accuracy ~82
+# accuracy ~82.6
 def extra_trees_feature_selection(data, splits=5):
+    # print(data.x_train_full.shape)
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
-    classifier = ExtraTreesClassifier(random_state=42)
-    results = cross_val_score(classifier, data.x_train_full, data.y_train_full, cv=skf)
+    classifier = ExtraTreesClassifier(random_state=42, n_estimators=5, max_depth=10, min_samples_split=8)
+    classifier = classifier.fit(data.x_train_full, data.y_train_full)
+    print(classifier.feature_importances_)
+
+    model = SelectFromModel(classifier, prefit=True)
+    X_new = model.transform(data.x_train_full)
+    print(X_new.shape)
+
+    results = cross_val_score(classifier, X_new, data.y_train_full, cv=skf)
     return results.mean()
 
 
@@ -65,7 +74,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = extra_trees_cross_validation_best_params(data)
+    accuracy = extra_trees_feature_selection(data)
     print(accuracy)
 
 
