@@ -51,13 +51,13 @@ def extra_trees_feature_selection(data, splits=5):
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     classifier = ExtraTreesClassifier(random_state=42, n_estimators=5, max_depth=10, min_samples_split=8)
     classifier = classifier.fit(data.x_train_full, data.y_train_full)
-    print(classifier.feature_importances_)
+    print("Importance of features: " + classifier.feature_importances_)
 
     model = SelectFromModel(classifier, prefit=True)
-    X_new = model.transform(data.x_train_full)
-    print(X_new.shape)
+    selected_x = model.transform(data.x_train_full)
+    print(selected_x.shape)
 
-    results = cross_val_score(classifier, X_new, data.y_train_full, cv=skf)
+    results = cross_val_score(classifier, selected_x, data.y_train_full, cv=skf)
     return results.mean()
 
 
