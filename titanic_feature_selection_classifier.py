@@ -1,6 +1,6 @@
 import pandas as pd
 from sklearn.ensemble import ExtraTreesClassifier
-from sklearn.feature_selection import SelectFromModel
+from sklearn.feature_selection import SelectFromModel, RFECV
 from sklearn.model_selection import StratifiedKFold, cross_val_score, GridSearchCV
 
 import feature_engineering as fe
@@ -41,7 +41,7 @@ def extra_trees_cross_validation_best_params(data, splits=5):
     classifier = ExtraTreesClassifier(random_state=42)
     gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
     gcv.fit(data.x_train_full, data.y_train_full)
-    print(gcv.best_params_)
+    print("Best params: " + gcv.best_params_)
     return gcv.best_score_
 
 
@@ -55,10 +55,44 @@ def extra_trees_feature_selection(data, splits=5):
 
     model = SelectFromModel(classifier, prefit=True)
     selected_x = model.transform(data.x_train_full)
-    print(selected_x.shape)
+    print("Selected shape: " + selected_x.shape)
 
     results = cross_val_score(classifier, selected_x, data.y_train_full, cv=skf)
     return results.mean()
+
+
+# accuracy ~84.2
+def extra_recursive_feature_selection(data, splits=5):
+    # print(data.x_train_full.shape)
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    classifier = ExtraTreesClassifier(random_state=42, n_estimators=5, max_depth=10, min_samples_split=8)
+
+    rfecv = RFECV(estimator=classifier, step=1, cv=StratifiedKFold(5),
+                  scoring='accuracy')
+    rfecv.fit(data.x_train, data.y_train)
+
+    print('Optimal number of features: ' + str(rfecv.n_features_))
+
+    selected_x_train = rfecv.transform(data.x_train)
+    selected_x_val = rfecv.transform(data.x_val)
+    selected_x_train_full = rfecv.transform(data.x_train_full)
+
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    parameters = {'n_estimators': [2, 5, 10, 25, 50, 100, 250, 500],
+                  'max_depth': [1, 2, 5, 7, 10, 15, 20, 50, 100, None], 'min_samples_split': [2, 3, 4, 5, 6, 7, 8, 10,
+                                                                                              15]}
+    classifier = ExtraTreesClassifier(random_state=42)
+    gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
+    gcv.fit(selected_x_train_full, data.y_train_full)
+    print("Best params: " + repr(gcv.best_params_))
+    return gcv.best_score_
+
+    # model = SelectFromModel(classifier, prefit=True)
+    # selected_x = model.transform(data.x_train_full)
+    # print(selected_x.shape)
+    #
+    # results = cross_val_score(classifier, selected_x, data.y_train_full, cv=skf)
+    # return results.mean()
 
 
 def main():
@@ -74,7 +108,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = extra_trees_feature_selection(data)
+    accuracy = extra_recursive_feature_selection(data)
     print(accuracy)
 
 
