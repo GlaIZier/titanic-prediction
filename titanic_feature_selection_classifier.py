@@ -95,6 +95,10 @@ def extra_recursive_feature_selection(data, splits=5):
     # return results.mean()
 
 
+def make_pipeline_classifier(data):
+    pass
+
+
 def main():
     # 1. Data analysis
     # da.show_data(raw_train, 'raw train set:')
