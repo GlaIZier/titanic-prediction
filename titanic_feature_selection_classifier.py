@@ -63,8 +63,6 @@ def extra_trees_feature_selection(data, splits=5):
 
 # accuracy ~84.2
 def extra_recursive_feature_selection(data, splits=5):
-    # print(data.x_train_full.shape)
-    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
     classifier = ExtraTreesClassifier(random_state=42, n_estimators=5, max_depth=10, min_samples_split=8)
 
     rfecv = RFECV(estimator=classifier, step=1, cv=StratifiedKFold(5),
@@ -86,13 +84,6 @@ def extra_recursive_feature_selection(data, splits=5):
     gcv.fit(selected_x_train_full, data.y_train_full)
     print("Best params: " + repr(gcv.best_params_))
     return gcv.best_score_
-
-    # model = SelectFromModel(classifier, prefit=True)
-    # selected_x = model.transform(data.x_train_full)
-    # print(selected_x.shape)
-    #
-    # results = cross_val_score(classifier, selected_x, data.y_train_full, cv=skf)
-    # return results.mean()
 
 
 def make_pipeline_classifier(data):
