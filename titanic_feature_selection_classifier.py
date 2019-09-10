@@ -2,6 +2,8 @@ import pandas as pd
 from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.feature_selection import SelectFromModel, RFECV
 from sklearn.model_selection import StratifiedKFold, cross_val_score, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.svm import LinearSVC
 
 import feature_engineering as fe
 
@@ -41,7 +43,7 @@ def extra_trees_cross_validation_best_params(data, splits=5):
     classifier = ExtraTreesClassifier(random_state=42)
     gcv = GridSearchCV(classifier, parameters, n_jobs=-1, cv=skf, verbose=1)
     gcv.fit(data.x_train_full, data.y_train_full)
-    print("Best params: " + gcv.best_params_)
+    print("Best params: " + repr(gcv.best_params_))
     return gcv.best_score_
 
 
@@ -71,8 +73,6 @@ def extra_recursive_feature_selection(data, splits=5):
 
     print('Optimal number of features: ' + str(rfecv.n_features_))
 
-    selected_x_train = rfecv.transform(data.x_train)
-    selected_x_val = rfecv.transform(data.x_val)
     selected_x_train_full = rfecv.transform(data.x_train_full)
 
     skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
@@ -86,8 +86,17 @@ def extra_recursive_feature_selection(data, splits=5):
     return gcv.best_score_
 
 
-def make_pipeline_classifier(data):
-    pass
+# accuracy ~81
+def make_pipeline_classifier(data, splits=5):
+    classifier = ExtraTreesClassifier(random_state=42, n_estimators=5, max_depth=10, min_samples_split=8)
+
+    pipeline = Pipeline([
+        ('feature_selection', SelectFromModel(LinearSVC(penalty="l1", dual=False))),
+        ('classification', classifier)
+    ])
+    skf = StratifiedKFold(n_splits=splits, shuffle=True, random_state=17)
+    results = cross_val_score(pipeline, data.x_train_full, data.y_train_full, cv=skf)
+    return results.mean()
 
 
 def main():
@@ -103,7 +112,7 @@ def main():
     fe.validation_border_index = validation_border_index
     data = fe.engineer_data()
 
-    accuracy = extra_recursive_feature_selection(data)
+    accuracy = extra_trees_cross_validation_best_params(data)
     print(accuracy)
 
 
