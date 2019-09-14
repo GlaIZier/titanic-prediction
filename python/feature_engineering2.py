@@ -1,13 +1,14 @@
 import numpy as np
 import pandas as pd
 
+import tensorflow
 from keras import models
 from keras.layers import Dense
 
 pd.options.display.max_columns = 100
 
-raw_train = pd.read_csv("data/train.csv")
-raw_test = pd.read_csv("data/test.csv")
+raw_train = pd.read_csv("../data/train.csv")
+raw_test = pd.read_csv("../data/test.csv")
 train_border_index = 891
 validation_border_index = 265
 

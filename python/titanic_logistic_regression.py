@@ -2,14 +2,12 @@ import pandas as pd
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV, SGDClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 
-import data_analysis as da
-import feature_engineering as fe
-
+from python import feature_engineering as fe
 
 pd.options.display.max_columns = 100
 
-raw_train = pd.read_csv("data/train.csv")
-raw_test = pd.read_csv("data/test.csv")
+raw_train = pd.read_csv("../data/train.csv")
+raw_test = pd.read_csv("../data/test.csv")
 train_border_index = 891
 validation_border_index = 265
 

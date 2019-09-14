@@ -34,8 +34,8 @@ plot.rcParams.update(params)
 # The embarkation. This describe three possible areas of the Titanic from which the people embark.
 # Three possible values S,C,Q
 
-raw_train = pd.read_csv("data/train.csv")
-raw_test = pd.read_csv("data/test.csv")
+raw_train = pd.read_csv("../data/train.csv")
+raw_test = pd.read_csv("../data/test.csv")
 train_border_index = 891
 
 

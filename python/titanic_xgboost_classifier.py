@@ -1,14 +1,14 @@
 import pandas as pd
-from sklearn.ensemble import ExtraTreesClassifier, GradientBoostingClassifier
+from sklearn.ensemble import GradientBoostingClassifier
 from sklearn.model_selection import StratifiedKFold, cross_val_score, GridSearchCV
 from xgboost import XGBClassifier
 
-import feature_engineering as fe
+from python import feature_engineering as fe
 
 pd.options.display.max_columns = 100
 
-raw_train = pd.read_csv("data/train.csv")
-raw_test = pd.read_csv("data/test.csv")
+raw_train = pd.read_csv("../data/train.csv")
+raw_test = pd.read_csv("../data/test.csv")
 train_border_index = 891
 validation_border_index = 265
 
