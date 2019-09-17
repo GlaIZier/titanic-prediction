@@ -20,3 +20,4 @@ lib/
 lib64/
 share/
 pyvenv.cfg
+.pynb_checkpoints/
