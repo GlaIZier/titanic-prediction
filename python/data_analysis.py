@@ -4,7 +4,6 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 import pylab as plot
 
-
 pd.options.display.max_columns = 100
 params = {
     'axes.labelsize': "large",
@@ -14,6 +13,7 @@ params = {
     'figure.figsize': [25, 7]
 }
 plot.rcParams.update(params)
+
 
 # 1. Data analysis
 
@@ -41,11 +41,11 @@ def show_data(data, label=''):
 def analyze_training_data(train):
     train['Died'] = 1 - train['Survived']
     train.groupby('Sex').agg('sum')[['Survived', 'Died']].plot(kind='bar', figsize=(25, 7),
-                                                                   stacked=True, color=['g', 'r'])
+                                                               stacked=True, color=['g', 'r'])
     plt.show()
 
     train.groupby('Sex').agg('mean')[['Survived', 'Died']].plot(kind='bar', figsize=(25, 7),
-                                                                    stacked=True, color=['g', 'r'])
+                                                                stacked=True, color=['g', 'r'])
     plt.show()
 
     sns.violinplot(x='Sex', y='Age',
@@ -73,7 +73,7 @@ def analyze_training_data(train):
     # fare - class correlation
     ax = plt.subplot()
     ax.set_ylabel('Average fare')
-    train.groupby('Pclass').mean()['Fare'].plot(kind='bar', figsize=(25, 7), ax = ax)
+    train.groupby('Pclass').mean()['Fare'].plot(kind='bar', figsize=(25, 7), ax=ax)
     plt.show()
 
     sns.violinplot(x='Embarked', y='Fare', hue='Survived', data=train, split=True, palette={0: "r", 1: "g"})
