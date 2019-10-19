@@ -363,11 +363,8 @@ x_test = remove_is_test(x_test)
 # show_data(y_val, 'y_val')
 # show_data(x_test, 'x_test')
 
-# Todo analyse data with plots and pandas again
 # Todo try pca, lda, qda to represent data and see the decision boundary
-# Todo implement NN and other models with less features
 # Todo implement NN and other models without feature engineering
-# Todo reach 90%
 
 model = models.Sequential()
 model.add(Dense(units=8, activation='relu', input_dim=x_train.shape[1]))
