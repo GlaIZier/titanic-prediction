@@ -364,6 +364,7 @@ x_test = remove_is_test(x_test)
 # show_data(x_test, 'x_test')
 
 # Todo try pca, lda, qda to represent data and see the decision boundary
+# Todo thickness plt, np, pandas, matplotlib, seaborn, sklearn,
 # Todo implement NN and other models without feature engineering
 
 model = models.Sequential()
