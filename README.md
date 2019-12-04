@@ -15,7 +15,7 @@ deactivate
 ```
 
 
-### Model performance
+### The performance of models in legacy python folder
 |  Model | CV  | CV with best params  |
 |---|---|---|
 | Decision tree |  82 |   |
@@ -32,3 +32,9 @@ deactivate
 | Random forest  | 83  | 84  |
 | Support vector machines  | 81  | 83  |
 | Xgboost classifier  |  81 | 83.7  |
+
+
+### The best models with metrics are located in notebooks
+
+### Run notebooks
+```jupyter notebook --port 8890```

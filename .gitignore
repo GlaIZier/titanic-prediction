@@ -21,3 +21,4 @@ lib64/
 share/
 pyvenv.cfg
 .ipynb_checkpoints/
+.csv
