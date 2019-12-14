@@ -14,6 +14,16 @@ To deactivate:
 deactivate
 ```
 
+### The best models with metrics are located in notebooks
+|  Model | The best achieved test set accuracy  |
+|---|---|
+| Extra trees | 80.382% |
+| Random forest | 79.990% |
+| Multi-layer perceptron | 79.990% |
+| Bag of models (Extra trees + Multi-layer perceptron) | 80.382% |
+
+### Run notebooks
+```jupyter notebook --port 8890```
 
 ### The performance of models in legacy python folder
 |  Model | CV  | CV with best params  |
@@ -32,9 +42,3 @@ deactivate
 | Random forest  | 83  | 84  |
 | Support vector machines  | 81  | 83  |
 | Xgboost classifier  |  81 | 83.7  |
-
-
-### The best models with metrics are located in notebooks
-
-### Run notebooks
-```jupyter notebook --port 8890```
