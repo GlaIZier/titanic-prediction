@@ -18,8 +18,8 @@ deactivate
 |  Model | The best achieved test set accuracy  |
 |---|---|
 | Extra trees | 80.382% |
-| Random forest | 79.990% |
-| Multi-layer perceptron | 79.990% |
+| Random forest | 79.904% |
+| Multi-layer perceptron | 79.904% |
 | Bag of models (Extra trees + Multi-layer perceptron) | 80.382% |
 
 ### Run notebooks
