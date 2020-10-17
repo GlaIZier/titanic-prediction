@@ -17,3 +17,4 @@ DEADJOE
 venv/
 .ipynb_checkpoints/
 predictions/
+*cache*
