@@ -15,9 +15,10 @@ deactivate
 ```
 
 ### The best models with metrics are located in notebooks
+#### Best test set score = 0.80382, top 13%
 |  Model | The best achieved test set accuracy  |
 |---|---|
-| Extra trees | 80.382% |
+| Extra trees | 80.382% | 
 | Random forest | 79.904% |
 | Multi-layer perceptron | 79.904% |
 | Bag of models (Extra trees + Multi-layer perceptron) | 80.382% |
