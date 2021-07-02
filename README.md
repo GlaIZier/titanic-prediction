@@ -1,3 +1,5 @@
+### Best test set score = 0.80382, top 13%
+
 ### To install
 To install global dependencies if they are needed:
 ```
@@ -15,7 +17,6 @@ deactivate
 ```
 
 ### The best models with metrics are located in notebooks
-#### Best test set score = 0.80382, top 13%
 |  Model | The best achieved test set accuracy  |
 |---|---|
 | Extra trees | 80.382% | 
